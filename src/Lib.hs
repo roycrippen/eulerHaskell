@@ -1,6 +1,8 @@
-module Lib
-    ( someFunc
-    ) where
+module Lib where
 
-someFunc :: IO ()
-someFunc = putStrLn "someFunc"
+import           P001_020 (solutionsP001_020)
+
+solutions :: [IO()]
+solutions = solutionsP001_020
+
+
