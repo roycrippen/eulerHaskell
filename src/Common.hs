@@ -4,9 +4,13 @@ module Common
     , assertEq
     , isPalindrome
     , digits
+    , factors
+    , groupPrimeFactors
     ) where
 
-import qualified Data.List as L
+import           Control.Arrow       ((&&&))
+import           Data.List           (group, unfoldr)
+import           Data.Numbers.Primes (primeFactors)
 
 -- test if solution is correct and create response
 assertEq :: (Show a, Eq a) => a -> a -> String -> String
@@ -31,7 +35,7 @@ fib' n = if even n then (p, q) else (p + q, p)
 
 -- finite list of fibonacci numbers
 -- from https://wiki.haskell.org/The_Fibonacci_sequence
-fibs = L.unfoldr (\(a,b) -> Just (a,(b,a+b))) (0,1)
+fibs = unfoldr (\(a,b) -> Just (a,(b,a+b))) (0,1)
 
 
 -- does list contain a palindrome; read same from and back
@@ -45,4 +49,12 @@ isPalindrome xs    = head xs == last xs && xs == reverse xs
 -- Integer number to list of digits
 -- from http://stackoverflow.com/questions/3963269/split-a-number-into-its-digits-with-haskell
 digits :: Integer -> [Integer]
-digits = reverse . L.unfoldr (\x -> if x == 0 then Nothing else Just (mod x 10, div x 10))
+digits = reverse . unfoldr (\x -> if x == 0 then Nothing else Just (mod x 10, div x 10))
+
+-- tupled group primeFactors [(prime, count), ...], groupPrimeFactors 28 == [(2,2),(7,1)]
+groupPrimeFactors :: Integer -> [(Integer, Int)]
+groupPrimeFactors = map (head &&& length) . group . primeFactors
+
+-- list of factors of a number, factors 28 == [1,7,2,14,4,28]
+factors :: Integer -> [Integer]
+factors = map product . mapM (\(p,m)-> [p^i | i<-[0..m]]) . groupPrimeFactors

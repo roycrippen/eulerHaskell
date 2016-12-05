@@ -1,6 +1,7 @@
 module P001_020 where
 
-import           Common              (assertEq, digits, fib, fibs, isPalindrome)
+import           Common              (assertEq, digits, factors, fib, fibs,
+                                      isPalindrome)
 import           Control.Monad       (liftM)
 import           Data.List           (tails, transpose)
 import           Data.Numbers.Primes (primeFactors, primes)
@@ -204,7 +205,9 @@ inputStrP011 =  "\
 -- Euler 012: Highly divisible triangular number
 p012 :: IO ()
 p012 = do
-    let res = 76576500
+    let natSums = drop 1 $ scanl (+) 0 [1..]
+        res =  head [x | x <- drop 1 natSums, length (factors x) > 500]
+
     putStrLn $ assertEq res 76576500 "p012"
 
 

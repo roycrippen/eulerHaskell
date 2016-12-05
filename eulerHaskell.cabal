@@ -3,8 +3,6 @@ version:             0.1.0.0
 synopsis:            Project Euler in Haskell
 description:         Please see README.md
 homepage:            https://github.com/roycrippen/eulerHaskell#readme
-license:             BSD3
-license-file:        LICENSE
 author:              roycrippen
 maintainer:          roycrippen@gmail.com
 build-type:          Simple
