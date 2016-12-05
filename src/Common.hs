@@ -1,5 +1,6 @@
 module Common
     ( fib
+    , fibs
     , assertEq
     , isPalindrome
     , digits
@@ -14,16 +15,24 @@ assertEq a b str =
     then "ERROR: " ++ str ++ " answer " ++ show a ++ " not equal to " ++ show b
     else str ++ " = " ++ show a
 
+
 -- pretty quick individaul fibonacci function
 fib :: Int -> Integer
-fib n = fst (fibs n)
+fib n
+    | n < 1 = 0
+    | otherwise = fst (fib' n)
 
-fibs :: Int -> (Integer, Integer)
-fibs 1 = (1, 0)
-fibs n = if even n then (p, q) else (p + q, p)
-    where (a, b) = fibs (n `div` 2)
+fib' :: Int -> (Integer, Integer)
+fib' 1 = (1, 0)
+fib' n = if even n then (p, q) else (p + q, p)
+    where (a, b) = fib' (n `div` 2)
           p = (2 * b + a) * a
           q = a * a + b * b
+
+-- finite list of fibonacci numbers
+-- from https://wiki.haskell.org/The_Fibonacci_sequence
+fibs = L.unfoldr (\(a,b) -> Just (a,(b,a+b))) (0,1)
+
 
 -- does list contain a palindrome; read same from and back
 -- [9,0,0,9] == True
