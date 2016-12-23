@@ -13,7 +13,7 @@ main = do
     case xs of
         [] -> do
                 putStrLn "Euler problems in Haskell...\n"
-                parallel_ solutions
+                parallel_ $ reverse solutions
                 stopGlobalPool
                 putStrLn "done"
         [x] -> do

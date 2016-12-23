@@ -1,6 +1,6 @@
 module P021_040 where
 
-import           Common (assertEq, sumFactors, sumFactorsList)
+import           Common (assertEq, sumFactors, sumFactorsStream)
 
 
 -------------------------------------------------------
@@ -10,9 +10,10 @@ p021 = do
     let res = sum $ amics 10000
     putStrLn $ assertEq res 31626 "p021"
 
+-- list of all amicable numbers from 1 to n
 amics :: Integer -> [Integer]
 amics n = map snd $ filter predicate xs
-            where xs = zip [0..] (sumFactorsList n)
+            where xs = zip [0..n] sumFactorsStream
                   predicate (i, item) = item < n && i /= item && i == snd (xs !! fromIntegral item)
 
 
@@ -34,18 +35,6 @@ p023 = do
 
 -------------------------------------------------------
 -- Euler 024:
-
-
-
-
-
-
-
-
-
-
-
-
 p024 :: IO ()
 p024 = do
     let res  = 0
