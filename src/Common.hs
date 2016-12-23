@@ -6,6 +6,8 @@ module Common
     , digits
     , factors
     , groupPrimeFactors
+    , sumFactors
+    , sumFactorsList
     ) where
 
 import           Control.Arrow       ((&&&))
@@ -58,3 +60,13 @@ groupPrimeFactors = map (head &&& length) . group . primeFactors
 -- list of factors of a number, factors 28 == [1,7,2,14,4,28]
 factors :: Integer -> [Integer]
 factors = map product . mapM (\(p,m)-> [p^i | i<-[0..m]]) . groupPrimeFactors
+
+-- sum of the factor of n not including n
+sumFactors :: Integer -> Integer
+sumFactors 0 = 0
+sumFactors n = sum (factors n) - n
+
+-- list of sum of factors from 0 to n
+sumFactorsList :: Integer -> [Integer]
+sumFactorsList n = map sumFactors [0..n]
+
