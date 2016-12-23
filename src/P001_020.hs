@@ -77,7 +77,6 @@ p007 = do
 p008 :: IO ()
 p008 = do
     str <- getData "p008.txt"
-
     let inputStr = filter (/= '\n') str
         chunks =  filter (/= "") (getChunks 13 inputStr)
         res = maximum [productOfDigits xs | xs <- chunks]
