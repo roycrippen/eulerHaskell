@@ -8,6 +8,7 @@ import           Text.Read                     (readMaybe)
 
 main :: IO ()
 main = do
+    let msg = "Enter a number between 1 and " ++ show (length solutions)
     xs <- getArgs
     case xs of
         [] -> do
@@ -21,7 +22,7 @@ main = do
                     (Just x) ->
                         if x > 0 && x <= length solutions
                             then solutions !! (x - 1 )
-                            else putStrLn $ "Number not in range. Enter number between 1 and " ++ show (length solutions)
-                    none -> putStrLn $ "Not a number. Enter number between 1 and " ++ show (length solutions)
-        _ -> putStrLn $ "Enter just one number between 1 and " ++ show (length solutions)
+                            else putStrLn $ "Number not in range. " ++ msg
+                    none -> putStrLn $ "Not a number" ++ msg
+        _ -> putStrLn $ "One arg only. " ++ msg
 
