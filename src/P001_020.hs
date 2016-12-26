@@ -3,8 +3,9 @@ module P001_020 where
 import           Common              (assertEq, digits, factors, fib, fibs,
                                       getData, isPalindrome)
 import           Control.Monad       (liftM)
-import           Data.List           (tails, transpose)
+import           Data.List           (elemIndices, maximumBy, tails, transpose)
 import           Data.Numbers.Primes (primeFactors, primes)
+import           Data.Ord            (comparing)
 
 
 -------------------------------------------------------
@@ -170,7 +171,7 @@ p012 = do
 
 
 -------------------------------------------------------
--- Euler 013:
+-- Euler 013: Large sum
 p013 :: IO ()
 p013 = do
     inputStr <- getData "p013.txt"
@@ -181,19 +182,45 @@ p013 = do
 
 
 -------------------------------------------------------
--- Euler 014:
+-- Euler 014: Longest Collatz sequence
 p014 :: IO ()
 p014 = do
-    let res = 0
-    putStrLn $ assertEq res 0 "p014"
+    let res = solveP014 1000000
+    putStrLn $ assertEq res 837799 "p014"
+    -- solve 1000 == 871
+
+collatz :: Int -> Int
+collatz n
+    | n == 1    = n
+    | even n    = 1 + collatz (n `div` 2)
+    | otherwise = 1 + collatz (3 * n + 1)
+
+maxIndex ::  Ord a => [a] -> Int
+maxIndex = fst . maximumBy (comparing snd) . zip [0..]
+
+solveP014 :: Int -> Int
+solveP014 n = 2 + head (elemIndices maxCollatz collatzs)
+    where collatzs = [collatz x | x <- [2 .. n]]
+          maxCollatz = maximum collatzs
+
+
+
 
 
 -------------------------------------------------------
 -- Euler 015:
 p015 :: IO ()
 p015 = do
+
     let res = 0
     putStrLn $ assertEq res 0 "p015"
+
+memoizedFib :: Int -> Integer
+memoizedFib = (map fib [0 ..] !!)
+   where fib 0 = 0
+         fib 1 = 1
+         fib n = memoizedFib (n-2) + memoizedFib (n-1)
+
 
 
 -------------------------------------------------------
