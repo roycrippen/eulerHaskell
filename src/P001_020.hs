@@ -2,10 +2,16 @@ module P001_020 where
 
 import           Common              (assertEq, digits, factors, fib, fibs,
                                       getData, isPalindrome)
-import           Control.Monad       (liftM)
+import           Control.Monad       (forM_, liftM)
+
+
+-- import           Control.Monad.ST
+import           Data.Array.ST
+import           Data.Array.Unboxed
 import           Data.List           (elemIndices, maximumBy, tails, transpose)
 import           Data.Numbers.Primes (primeFactors, primes)
 import           Data.Ord            (comparing)
+import           Data.Tuple
 
 
 -------------------------------------------------------
@@ -185,23 +191,33 @@ p013 = do
 -- Euler 014: Longest Collatz sequence
 p014 :: IO ()
 p014 = do
-    let res = solveP014 1000000
+    let ar = collatzArray 1000000
+        res = snd $ maximum $ map swap $ assocs ar
     putStrLn $ assertEq res 837799 "p014"
-    -- solve 1000 == 871
 
-collatz :: Int -> Int
-collatz n
-    | n == 1    = n
-    | even n    = 1 + collatz (n `div` 2)
-    | otherwise = 1 + collatz (3 * n + 1)
+collatzArray :: Int -> UArray Int Int
+collatzArray n = runSTUArray $ do
+    let
+        cache :: Int -> Array Int Int
+        cache n = array (1, n) [ (x, collatz' x) | x <- [1..n] ]
 
-maxIndex ::  Ord a => [a] -> Int
-maxIndex = fst . maximumBy (comparing snd) . zip [0..]
+        ar = cache n
 
-solveP014 :: Int -> Int
-solveP014 n = 2 + head (elemIndices maxCollatz collatzs)
-    where collatzs = [collatz x | x <- [2 .. n]]
-          maxCollatz = maximum collatzs
+        collatz' :: Int -> Int
+        collatz' 1 = 1
+        collatz' x
+            | even x    = 1 + collatz (x `div` 2)
+            | otherwise = 1 + collatz (3 * x + 1)
+
+        collatz :: Int -> Int
+        collatz x
+            | x <= n    = ar ! x
+            | otherwise = collatz' x
+
+    res <- newArray (1, n) 0
+    writeArray res 1 1
+    forM_ [1..n] $ \c -> writeArray res c (ar ! c)
+    return res
 
 
 
@@ -211,15 +227,9 @@ solveP014 n = 2 + head (elemIndices maxCollatz collatzs)
 -- Euler 015:
 p015 :: IO ()
 p015 = do
-
     let res = 0
     putStrLn $ assertEq res 0 "p015"
 
-memoizedFib :: Int -> Integer
-memoizedFib = (map fib [0 ..] !!)
-   where fib 0 = 0
-         fib 1 = 1
-         fib n = memoizedFib (n-2) + memoizedFib (n-1)
 
 
 
@@ -244,7 +254,7 @@ p017 = do
 p018 :: IO ()
 p018 = do
     let res = 0
-    putStrLn $ assertEq res 0 "p018"
+    putStrLn $ assertEq res 0 "p018"---------------------
 
 
 -------------------------------------------------------
@@ -263,7 +273,7 @@ p020 = do
     putStrLn $ assertEq res 0 "p020"
 
 
-solutionsP001_020 :: [IO()]
+solutionsP001_020 :: [IO()]---------------------
 solutionsP001_020 =
     [ p001, p002, p003, p004, p005, p006, p007, p008, p009, p010
     , p011, p012, p013, p014, p015, p016, p017, p018, p019, p020 ]

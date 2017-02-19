@@ -19,6 +19,7 @@ library
   other-modules:       Paths_eulerHaskell
   build-depends:       base >= 4.7 && < 5
                      , primes
+                     , array
   default-language:    Haskell2010
 
 executable eulerHaskell-exe

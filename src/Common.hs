@@ -12,6 +12,7 @@ module Common
     ) where
 
 import           Control.Arrow       ((&&&))
+import           Data.Array.ST
 import           Data.List           (group, unfoldr)
 import           Data.Numbers.Primes (primeFactors)
 import           Paths_eulerHaskell
