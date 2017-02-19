@@ -3,9 +3,6 @@ module P001_020 where
 import           Common              (assertEq, digits, factors, fib, fibs,
                                       getData, isPalindrome)
 import           Control.Monad       (forM_, liftM)
-
-
--- import           Control.Monad.ST
 import           Data.Array.ST
 import           Data.Array.Unboxed
 import           Data.List           (elemIndices, maximumBy, tails, transpose)
@@ -220,17 +217,12 @@ collatzArray n = runSTUArray $ do
     return res
 
 
-
-
-
 -------------------------------------------------------
 -- Euler 015:
 p015 :: IO ()
 p015 = do
     let res = 0
     putStrLn $ assertEq res 0 "p015"
-
-
 
 
 -------------------------------------------------------
