@@ -206,7 +206,7 @@ maxCollatz n =   maximum . map swap $ assocs $ runSTUArray $ do
                               | even x    = fmap (+ 1) (collatz (x `div` 2))
                               | otherwise = fmap (+ 1) (collatz (3 * x + 1))
 
-    -- get collatz(i) for i = [1..n]
+        -- get collatz(i) for i = [1..n]
         loop = do
             i <- readSTRef idx
             case i of
