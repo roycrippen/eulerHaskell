@@ -1,14 +1,14 @@
 module P001_020 where
 
-import           Common              (assertEq, digits, factors, fib, fibs,
-                                      getData, isPalindrome)
-import           Control.Monad       (forM_, liftM)
-import           Data.Array.ST
-import           Data.Array.Unboxed
+import           Common              (assertEq, digits, factors, fib, fibs, getData, isPalindrome)
+import           Control.Monad       (forM_, liftM, when)
+import           Data.Array.ST       (STUArray, newArray, readArray, runSTUArray, writeArray)
+import           Data.Array.Unboxed  (assocs)
 import           Data.List           (elemIndices, maximumBy, tails, transpose)
 import           Data.Numbers.Primes (primeFactors, primes)
 import           Data.Ord            (comparing)
-import           Data.Tuple
+import           Data.STRef          (modifySTRef, newSTRef, readSTRef)
+import           Data.Tuple          (swap)
 
 
 -------------------------------------------------------
@@ -188,33 +188,38 @@ p013 = do
 -- Euler 014: Longest Collatz sequence
 p014 :: IO ()
 p014 = do
-    let ar = collatzArray 1000000
-        res = snd $ maximum $ map swap $ assocs ar
+    let (_, res) = maxCollatz 1000000
     putStrLn $ assertEq res 837799 "p014"
 
-collatzArray :: Int -> UArray Int Int
-collatzArray n = runSTUArray $ do
-    let
-        cache :: Int -> Array Int Int
-        cache n = array (1, n) [ (x, collatz' x) | x <- [1..n] ]
+maxCollatz :: Int -> (Int, Int)
+maxCollatz n =   maximum . map swap $ assocs $ runSTUArray $ do
+    arr <- newArray (1, n) 0
+    idx <- newSTRef 1
 
-        ar = cache n
+    let collatz x
+            | x == 1 = return 1
+            | x > n  = go x
+            | otherwise = do
+                  cached <- readArray arr x
+                  if cached == 0 then go x else return cached
+                    where go x
+                              | even x    = fmap (+ 1) (collatz (x `div` 2))
+                              | otherwise = fmap (+ 1) (collatz (3 * x + 1))
 
-        collatz' :: Int -> Int
-        collatz' 1 = 1
-        collatz' x
-            | even x    = 1 + collatz (x `div` 2)
-            | otherwise = 1 + collatz (3 * x + 1)
-
-        collatz :: Int -> Int
-        collatz x
-            | x <= n    = ar ! x
-            | otherwise = collatz' x
-
-    res <- newArray (1, n) 0
-    writeArray res 1 1
-    forM_ [1..n] $ \c -> writeArray res c (ar ! c)
-    return res
+    -- get collatz(i) for i = [1..n]
+        loop = do
+            i <- readSTRef idx
+            case i of
+                k | k > n     -> return arr
+                  | otherwise -> do
+                      val <- readArray arr i
+                      when (val == 0) $ do
+                          res <- collatz i
+                          writeArray arr i res
+                      modifySTRef idx (+ 1)
+                      loop
+    -- start the loop
+    loop
 
 
 -------------------------------------------------------

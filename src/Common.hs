@@ -54,6 +54,7 @@ fib' n = if even n then (p, q) else (p + q, p)
 -------------------------------------------------------
 -- stream list of fibonacci numbers
 -- from https://wiki.haskell.org/The_Fibonacci_sequence
+
 fibs = unfoldr (\(a,b) -> Just (a,(b,a+b))) (0,1)
 
 
@@ -83,7 +84,7 @@ groupPrimeFactors = map (head &&& length) . group . primeFactors
 -------------------------------------------------------
 -- list of factors of a number, factors 28 == [1,7,2,14,4,28]
 factors :: Integer -> [Integer]
-factors = map product . mapM (\(p,m)-> [p^i | i<-[0..m]]) . groupPrimeFactors
+factors = map product . mapM (\(p,m) -> [p^i | i <- [0..m]]) . groupPrimeFactors
 
 
 -------------------------------------------------------
