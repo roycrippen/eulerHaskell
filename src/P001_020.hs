@@ -1,14 +1,15 @@
 module P001_020 where
 
-import           Common              (assertEq, digits, factors, fib, fibs, getData, isPalindrome)
-import           Control.Monad       (forM_, liftM, when)
-import           Data.Array.ST       (STUArray, newArray, readArray, runSTUArray, writeArray)
-import           Data.Array.Unboxed  (assocs)
-import           Data.List           (elemIndices, maximumBy, tails, transpose)
-import           Data.Numbers.Primes (primeFactors, primes)
-import           Data.Ord            (comparing)
-import           Data.STRef          (modifySTRef, newSTRef, readSTRef)
-import           Data.Tuple          (swap)
+import           Common                    (assertEq, digits, factors, fib, fibs, getData, isPalindrome)
+import           Control.Monad             (forM_, liftM, when)
+import           Data.Array.ST             (STUArray, newArray, readArray, runSTUArray, writeArray)
+import           Data.Array.Unboxed        (assocs)
+import           Data.Char                 (digitToInt)
+import           Data.List                 (elemIndices, maximumBy, tails, transpose)
+import           Data.Numbers.Primes       (primeFactors, primes)
+import           Data.Ord                  (comparing)
+import           Data.STRef                (modifySTRef, newSTRef, readSTRef)
+import           Data.Tuple                (swap)
 
 
 -------------------------------------------------------
@@ -226,16 +227,22 @@ maxCollatz n =   maximum . map swap $ assocs $ runSTUArray $ do
 -- Euler 015:
 p015 :: IO ()
 p015 = do
-    let res = 0
-    putStrLn $ assertEq res 0 "p015"
+    -- C(n,r) = n!/(r!(n-r)!)
+    -- 40!/20!*20!
+    let fact20 = product [1..20] :: Integer
+        fact40 = foldr (*) fact20 [21..40]
+        res = fact40 `div` (fact20 * fact20)
+    putStrLn $ assertEq res 137846528820 "p015"
+
+
 
 
 -------------------------------------------------------
 -- Euler 016:
 p016 :: IO ()
 p016 = do
-    let res = 0
-    putStrLn $ assertEq res 0 "p016"
+    let res = sum . map digitToInt $ show (2^1000)
+    putStrLn $ assertEq res 1366 "p016"
 
 
 -------------------------------------------------------
