@@ -1,15 +1,15 @@
 module P001_020 where
 
-import           Common                    (assertEq, digits, factors, fib, fibs, getData, isPalindrome)
-import           Control.Monad             (forM_, liftM, when)
-import           Data.Array.ST             (STUArray, newArray, readArray, runSTUArray, writeArray)
-import           Data.Array.Unboxed        (assocs)
-import           Data.Char                 (digitToInt)
-import           Data.List                 (elemIndices, maximumBy, tails, transpose)
-import           Data.Numbers.Primes       (primeFactors, primes)
-import           Data.Ord                  (comparing)
-import           Data.STRef                (modifySTRef, newSTRef, readSTRef)
-import           Data.Tuple                (swap)
+import           Common              (assertEq, digits, factors, fib, fibs, getData, isPalindrome)
+import           Control.Monad       (forM_, liftM, when)
+import           Data.Array.ST       (STUArray, newArray, readArray, runSTUArray, writeArray)
+import           Data.Array.Unboxed  (assocs)
+import           Data.Char           (digitToInt, isSpace)
+import           Data.List           (elemIndices, maximumBy, tails, transpose)
+import           Data.Numbers.Primes (primeFactors, primes)
+import           Data.Ord            (comparing)
+import           Data.STRef          (modifySTRef, newSTRef, readSTRef)
+import           Data.Tuple          (swap)
 
 
 -------------------------------------------------------
@@ -235,8 +235,6 @@ p015 = do
     putStrLn $ assertEq res 137846528820 "p015"
 
 
-
-
 -------------------------------------------------------
 -- Euler 016:
 p016 :: IO ()
@@ -249,9 +247,25 @@ p016 = do
 -- Euler 017:
 p017 :: IO ()
 p017 = do
-    let res = 0
-    putStrLn $ assertEq res 0 "p017"
+    let str = concat [numToWords n | n <- [1..1000]]
+    let res = length $ filter (not . isSpace) str
+    putStrLn $ assertEq res 21124 "p017"
 
+numToWords :: Int -> String
+numToWords n
+    | n <       0 = ""
+    | n <      20 = numUntis !!  n
+    | n <     100 = numTens  !! (n `div` 10)     ++ " "          ++ numToWords (n `mod` 10)
+    | n <    1000 = numUntis !! (n `div` 100)    ++ numAnds n    ++ numToWords (n `mod` 100)
+    | n <   10000 = numUntis !! (n `div` 1000)   ++ " thousand " ++ numToWords (n `mod` 1000)
+    | n <  100000 = numTens  !! (n `div` 10000)  ++ " "          ++ numToWords (n `mod` 10000)
+    | n < 1000000 = numUntis !! (n `div` 100000) ++ " million "  ++ numToWords (n `mod` 100000)
+    | otherwise = ""
+        where
+            numUntis = ["", "one", "two", "three", "four", "five", "six", "seven", "eight", "nine", "ten", "eleven",
+                        "twelve", "thirteen", "fourteen", "fifteen", "sixteen", "seventeen", "eighteen", "nineteen"]
+            numTens = ["", "ten", "twenty", "thirty", "forty", "fifty", "sixty", "seventy", "eighty", "ninety"]
+            numAnds n = if n `mod` 100 == 0 then " hundred " else " hundred and "
 
 -------------------------------------------------------
 -- Euler 018:
