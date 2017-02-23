@@ -258,7 +258,7 @@ numToWords n
     | n <     100 = numTens  !! (n `div` 10)     ++ " "          ++ numToWords (n `mod` 10)
     | n <    1000 = numUntis !! (n `div` 100)    ++ numAnds n    ++ numToWords (n `mod` 100)
     | n <   10000 = numUntis !! (n `div` 1000)   ++ " thousand " ++ numToWords (n `mod` 1000)
-    | n <  100000 = numTens  !! (n `div` 10000)  ++ " "          ++ numToWords (n `mod` 10000)
+    | n <  100000 = numTens  !! (n `div` 10000)  ++ " thousand " ++ numToWords (n `mod` 10000)
     | n < 1000000 = numUntis !! (n `div` 100000) ++ " million "  ++ numToWords (n `mod` 100000)
     | otherwise = ""
         where
@@ -266,6 +266,7 @@ numToWords n
                         "twelve", "thirteen", "fourteen", "fifteen", "sixteen", "seventeen", "eighteen", "nineteen"]
             numTens = ["", "ten", "twenty", "thirty", "forty", "fifty", "sixty", "seventy", "eighty", "ninety"]
             numAnds n = if n `mod` 100 == 0 then " hundred " else " hundred and "
+
 
 -------------------------------------------------------
 -- Euler 018:
