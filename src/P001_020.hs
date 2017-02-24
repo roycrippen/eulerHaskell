@@ -272,8 +272,18 @@ numToWords n
 -- Euler 018:
 p018 :: IO ()
 p018 = do
-    let res = 0
-    putStrLn $ assertEq res 0 "p018"---------------------
+    -- xs <- getData "p018.txt"
+    -- putStrLn xs
+    let str = "3\n7 4\n2 4 6\n8 5 9 3"
+
+        convert :: String -> [[Int]]
+        convert = map (map read . words) . lines
+        xss = convert str
+
+    print xss
+
+
+    putStrLn $ assertEq 0 0 "p018"---------------------
 
 
 -------------------------------------------------------
