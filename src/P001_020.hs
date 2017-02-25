@@ -86,19 +86,20 @@ p008 = do
         chunks =  filter (/= "") (getChunks 13 inputStr)
         res = maximum [productOfDigits xs | xs <- chunks]
 
+        -- break into chunks of n length strings
+        getChunks :: Int -> String -> [String]
+        getChunks n xs
+            | length xs < n = []
+            | otherwise = chunk : getChunks n (tail xs)
+                where chunk = if '0' `elem` chunk' then "" else chunk'
+                        where chunk' = take n xs
+
+        -- product of digits in a string of digits
+        productOfDigits :: String -> Integer
+        productOfDigits str = product $ digits (read str)
+
     putStrLn $ assertEq res 23514624000 "p008"
 
--- break into chunks of n length strings
-getChunks :: Int -> String -> [String]
-getChunks n xs
-    | length xs < n = []
-    | otherwise = chunk : getChunks n (tail xs)
-        where chunk = if '0' `elem` chunk' then "" else chunk'
-                where chunk' = take n xs
-
--- product of digits in a string of digits
-productOfDigits :: String -> Integer
-productOfDigits str = product $ digits (read str)
 
 
 -------------------------------------------------------
@@ -129,39 +130,39 @@ p011 = do
     let grid = fillGrid inputStr
         res = maximum [prodMax $ direction grid | direction <- [east, south, southEast, southWest]]
 
+        -- read input data string and fill grid
+        fillGrid :: String -> [[Int]]
+        fillGrid = map (map read . words) . lines
+
+        -- remove candidates with less than 4 elements
+        prune :: [[Int]] ->[[Int]]
+        prune = filter (\ys -> length ys == 4)
+
+        -- horizontal candidates
+        east :: [[Int]] ->[[Int]]
+        east = prune . concatMap (map (take 4) . tails)
+
+        -- vertical candidates
+        south :: [[Int]] ->[[Int]]
+        south = east . transpose
+
+        -- grab half the diagonals
+        diagonal :: [[Int]] -> [[Int]]
+        diagonal = south . zipWith drop [0 ..]
+
+        -- east half of diagonals
+        southEast :: [[Int]] -> [[Int]]
+        southEast = concatMap diagonal . tails
+
+        -- west half of diagonals
+        southWest :: [[Int]] -> [[Int]]
+        southWest = southEast . map reverse
+
+        -- product maximum of a list of candidates
+        prodMax :: [[Int]] -> Int
+        prodMax = maximum . map product
+
     putStrLn $ assertEq res 70600674 "p011"
-
--- read input data string and fill grid
-fillGrid :: String -> [[Int]]
-fillGrid = map (map read . words) . lines
-
--- remove candidates with less than 4 elements
-prune :: [[Int]] ->[[Int]]
-prune = filter (\ys -> length ys == 4)
-
--- horizontal candidates
-east :: [[Int]] ->[[Int]]
-east = prune . concatMap (map (take 4) . tails)
-
--- vertical candidates
-south :: [[Int]] ->[[Int]]
-south = east . transpose
-
--- grab half the diagonals
-diagonal :: [[Int]] -> [[Int]]
-diagonal = south . zipWith drop [0 ..]
-
--- east half of diagonals
-southEast :: [[Int]] -> [[Int]]
-southEast = concatMap diagonal . tails
-
--- west half of diagonals
-southWest :: [[Int]] -> [[Int]]
-southWest = southEast . map reverse
-
--- product maximum of a list of candidates
-prodMax :: [[Int]] -> Int
-prodMax = maximum . map product
 
 
 -------------------------------------------------------
@@ -248,50 +249,62 @@ p016 = do
 p017 :: IO ()
 p017 = do
     let str = concat [numToWords n | n <- [1..1000]]
-    let res = length $ filter (not . isSpace) str
-    putStrLn $ assertEq res 21124 "p017"
+        res = length $ filter (not . isSpace) str
 
-numToWords :: Int -> String
-numToWords n
-    | n <       0 = ""
-    | n <      20 = numUntis !!  n
-    | n <     100 = numTens  !! (n `div` 10)     ++ " "          ++ numToWords (n `mod` 10)
-    | n <    1000 = numUntis !! (n `div` 100)    ++ numAnds n    ++ numToWords (n `mod` 100)
-    | n <   10000 = numUntis !! (n `div` 1000)   ++ " thousand " ++ numToWords (n `mod` 1000)
-    | n <  100000 = numTens  !! (n `div` 10000)  ++ " thousand " ++ numToWords (n `mod` 10000)
-    | n < 1000000 = numUntis !! (n `div` 100000) ++ " million "  ++ numToWords (n `mod` 100000)
-    | otherwise = ""
-        where
-            numUntis = ["", "one", "two", "three", "four", "five", "six", "seven", "eight", "nine", "ten", "eleven",
-                        "twelve", "thirteen", "fourteen", "fifteen", "sixteen", "seventeen", "eighteen", "nineteen"]
-            numTens = ["", "ten", "twenty", "thirty", "forty", "fifty", "sixty", "seventy", "eighty", "ninety"]
-            numAnds n = if n `mod` 100 == 0 then " hundred " else " hundred and "
+        numToWords :: Int -> String
+        numToWords n
+            | n <       0 = ""
+            | n <      20 = numUntis !!  n
+            | n <     100 = numTens  !! (n `div` 10)     ++ " "          ++ numToWords (n `mod` 10)
+            | n <    1000 = numUntis !! (n `div` 100)    ++ numAnds n    ++ numToWords (n `mod` 100)
+            | n <   10000 = numUntis !! (n `div` 1000)   ++ " thousand " ++ numToWords (n `mod` 1000)
+            | n <  100000 = numTens  !! (n `div` 10000)  ++ " thousand " ++ numToWords (n `mod` 10000)
+            | n < 1000000 = numUntis !! (n `div` 100000) ++ " million "  ++ numToWords (n `mod` 100000)
+            | otherwise = ""
+                where
+                    numUntis = ["", "one", "two", "three", "four", "five", "six", "seven", "eight", "nine", "ten", "eleven",
+                                "twelve", "thirteen", "fourteen", "fifteen", "sixteen", "seventeen", "eighteen", "nineteen"]
+                    numTens = ["", "ten", "twenty", "thirty", "forty", "fifty", "sixty", "seventy", "eighty", "ninety"]
+                    numAnds n = if n `mod` 100 == 0 then " hundred " else " hundred and "
+
+    putStrLn $ assertEq res 21124 "p017"
 
 
 -------------------------------------------------------
 -- Euler 018:
 p018 :: IO ()
 p018 = do
-    -- xs <- getData "p018.txt"
-    -- putStrLn xs
-    let str = "3\n7 4\n2 4 6\n8 5 9 3"
+    xss <- getData "p018.txt"
 
-        convert :: String -> [[Int]]
-        convert = map (map read . words) . lines
-        xss = convert str
+    let res = sum . head . go . reverse $ fillLists xss
 
-    print xss
+        fillLists :: String -> [[Int]]
+        fillLists = map (map read . words) . lines
 
+        maxPair :: [Int] -> [Int]
+        maxPair xs = zipWith max xs (drop 1 xs)
 
-    putStrLn $ assertEq 0 0 "p018"---------------------
+        sumTwoRows :: [Int] -> [Int] -> [Int]
+        sumTwoRows xs = zipWith (+) (maxPair xs)
+
+        go :: [[Int]] -> [[Int]]
+        go xss@(xs:ys:zs) =
+            case length xss of
+                0 -> []
+                1 -> [head xss]
+                2 -> [sumTwoRows xs ys]
+                _ -> go (sumTwoRows xs ys : zs)
+
+    putStrLn $ assertEq res 1074 "p019"
 
 
 -------------------------------------------------------
 -- Euler 019:
 p019 :: IO ()
 p019 = do
+
     let res = 0
-    putStrLn $ assertEq res 0 "p019"
+    putStrLn $ assertEq res 10074 "p019"
 
 
 -------------------------------------------------------
