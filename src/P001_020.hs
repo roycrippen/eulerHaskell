@@ -3,12 +3,12 @@ module P001_020 where
 import           Common              (assertEq, digits, factors, fib, fibs, getData, isPalindrome)
 import           Control.Monad       (forM_, liftM, when)
 import           Data.Array.ST       (STUArray, newArray, readArray, runSTUArray, writeArray)
-import           Data.Array.Unboxed  (assocs)
+import           Data.Array.Unboxed  ((!))
 import           Data.Char           (digitToInt, isSpace)
 import           Data.List           (elemIndices, maximumBy, tails, transpose)
 import           Data.Numbers.Primes (primeFactors, primes)
 import           Data.Ord            (comparing)
-import           Data.STRef          (modifySTRef, newSTRef, readSTRef)
+import           Data.STRef          (modifySTRef', newSTRef, readSTRef)
 import           Data.Tuple          (swap)
 
 
@@ -180,8 +180,9 @@ p012 = do
 p013 :: IO ()
 p013 = do
     inputStr <- getData "p013.txt"
-    let xs = sum $ map (\s -> read s :: Integer) $ lines inputStr
+    let xs = sum $ map (\s -> read s :: Integer) $   lines inputStr
         res = read (take 10 $ show xs) :: Integer
+
 
     putStrLn $ assertEq res 5537376230 "p013"
 
@@ -190,38 +191,47 @@ p013 = do
 -- Euler 014: Longest Collatz sequence
 p014 :: IO ()
 p014 = do
-    let (_, res) = maxCollatz 1000000
+    let res = maxCollatz 1000000
     putStrLn $ assertEq res 837799 "p014"
 
-maxCollatz :: Int -> (Int, Int)
-maxCollatz n =   maximum . map swap $ assocs $ runSTUArray $ do
-    arr <- newArray (1, n) 0
-    idx <- newSTRef 1
+maxCollatz :: Int -> Int
+-- maxCollatz n =   maximum . map swap $ assocs $ runSTUArray $ do
+maxCollatz n = arr' ! 1 where
+        arr' =  runSTUArray $ do
+            arr  <- newArray (1, n + 1) 0
+            idx  <- newSTRef 1
+            best <- newSTRef (0 :: Int)
 
-    let collatz x
-            | x == 1 = return 1
-            | x > n  = go x
-            | otherwise = do
-                  cached <- readArray arr x
-                  if cached == 0 then go x else return cached
-                    where go x
-                              | even x    = fmap (+ 1) (collatz (x `div` 2))
-                              | otherwise = fmap (+ 1) (collatz (3 * x + 1))
+            let collatz x
+                    | x == 1 = return 1
+                    | x > n  = go x
+                    | otherwise = do
+                        cached <- readArray arr x
+                        if cached == 0 then go x else return cached
+                            where go x
+                                    | even x    = fmap (+ 1) (collatz (x `div` 2))
+                                    | otherwise = fmap (+ 1) (collatz (3 * x + 1))
 
-        -- get collatz(i) for i = [1..n]
-        loop = do
-            i <- readSTRef idx
-            case i of
-                k | k > n     -> return arr
-                  | otherwise -> do
-                      val <- readArray arr i
-                      when (val == 0) $ do
-                          res <- collatz i
-                          writeArray arr i res
-                      modifySTRef idx (+ 1)
-                      loop
-    -- start the loop
-    loop
+                -- get collatz(i) for i = [1..n]
+                loop = do
+                    i <- readSTRef idx
+                    case i of
+                          k | k > n     -> return arr
+                            | otherwise -> do
+                                val <- readArray arr i
+                                -- add new item to cache
+                                when (val == 0) $ do
+                                    res <- collatz i
+                                    writeArray arr i res
+                                    -- save the index of the best result
+                                    best' <- readSTRef best
+                                    when (res > best') $ do
+                                        writeArray arr 1 i
+                                        modifySTRef' best (const res)
+                                modifySTRef' idx (+ 1)
+                                loop
+            -- start the loop
+            loop
 
 
 -------------------------------------------------------
@@ -302,9 +312,26 @@ p018 = do
 -- Euler 019:
 p019 :: IO ()
 p019 = do
+    let leap = [1904, 1908, 1912, 1916, 1920, 1924, 1928, 1932, 1936, 1940, 1944, 1948, 1952, 1956, 1960,
+                1964, 1968, 1972, 1976, 1980, 1984, 1988, 1992, 1996, 2000, 2004, 2008, 2012, 2016, 2020]
+        days y
+            | y `elem` leap = [31, 29, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31]
+            | otherwise     = [31, 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31]
 
-    let res = 0
-    putStrLn $ assertEq res 10074 "p019"
+        months :: [Int]
+        months = [d | y <- [1900..2000], d <- days y]
+
+        lastDayofMonth :: Int -> Int -> Int
+        lastDayofMonth seed mDays
+                | mDays + seed > 7 = lastDayofMonth seed (mDays - 7)
+                | otherwise        = seed + mDays
+
+
+        dows :: [Int] -> [Int]
+        dows xs = drop 12 $ init $ scanl lastDayofMonth 2 xs
+
+    let res = length $ filter (==1) $ dows months
+    putStrLn $ assertEq res 171 "p019"
 
 
 -------------------------------------------------------
@@ -312,7 +339,7 @@ p019 = do
 p020 :: IO ()
 p020 = do
     let res = 0
-    putStrLn $ assertEq res 0 "p020"
+    putStrLn $ assertEq res 1 "p020"
 
 
 solutionsP001_020 :: [IO()]---------------------
