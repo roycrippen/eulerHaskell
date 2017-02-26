@@ -1,15 +1,15 @@
 module P001_020 where
 
-import           Common              (assertEq, digits, factors, fib, fibs, getData, isPalindrome)
-import           Control.Monad       (forM_, liftM, when)
-import           Data.Array.ST       (STUArray, newArray, readArray, runSTUArray, writeArray)
-import           Data.Array.Unboxed  ((!))
-import           Data.Char           (digitToInt, isSpace)
-import           Data.List           (elemIndices, maximumBy, tails, transpose)
-import           Data.Numbers.Primes (primeFactors, primes)
-import           Data.Ord            (comparing)
-import           Data.STRef          (modifySTRef', newSTRef, readSTRef)
-import           Data.Tuple          (swap)
+import           Common                      (assertEq, digits, factors, fibs, getData, isPalindrome)
+import           Control.Monad               (when)
+import           Control.Monad.ST            (runST)
+import           Data.Array.ST               (STUArray, newArray, readArray, runSTUArray, writeArray)
+import           Data.Array.Unboxed          ((!))
+import           Data.Char                   (digitToInt, isSpace)
+import           Data.List                   (tails, transpose)
+import           Data.Numbers.Primes         (primeFactors, primes)
+import           Data.STRef                  (modifySTRef', newSTRef, readSTRef)
+import qualified Data.Vector.Unboxed.Mutable as M
 
 
 -------------------------------------------------------
@@ -45,7 +45,6 @@ p004 = do
                            y <- [100..999],
                            let z = x * y,
                            (z `mod` 11 == 0) && isPalindrome (show z)]
-
     putStrLn $ assertEq res 906609 "p004"
 
 
@@ -54,7 +53,6 @@ p004 = do
 p005 :: IO ()
 p005 = do
     let res = foldl lcm 1 [1..20]
-
     putStrLn $ assertEq res 232792560 "p005"
 
 
@@ -65,7 +63,6 @@ p006 = do
     let sums = sum [1..100]
         sumSquares = sum [x * x | x <- [1..100]]
         res = sums * sums - sumSquares
-
     putStrLn $ assertEq res 25164150 "p006"
 
 
@@ -82,24 +79,23 @@ p007 = do
 p008 :: IO ()
 p008 = do
     str <- getData "p008.txt"
+
     let inputStr = filter (/= '\n') str
         chunks =  filter (/= "") (getChunks 13 inputStr)
         res = maximum [productOfDigits xs | xs <- chunks]
-
-        -- break into chunks of n length strings
-        getChunks :: Int -> String -> [String]
-        getChunks n xs
-            | length xs < n = []
-            | otherwise = chunk : getChunks n (tail xs)
-                where chunk = if '0' `elem` chunk' then "" else chunk'
-                        where chunk' = take n xs
-
-        -- product of digits in a string of digits
-        productOfDigits :: String -> Integer
-        productOfDigits str = product $ digits (read str)
-
     putStrLn $ assertEq res 23514624000 "p008"
 
+-- break into chunks of n length strings
+getChunks :: Int -> String -> [String]
+getChunks n xs
+    | length xs < n = []
+    | otherwise = chunk : getChunks n (tail xs)
+        where chunk = if '0' `elem` chunk' then "" else chunk'
+                where chunk' = take n xs
+
+-- product of digits in a string of digits
+productOfDigits :: String -> Integer
+productOfDigits str = product $ digits (read str)
 
 
 -------------------------------------------------------
@@ -109,8 +105,8 @@ p009 = do
     let (a,b) = head [(a,b) | a <- [2..500],
                               b <- [a..500],
                               a + b < 1000 && a * a + b * b == (1000 - a - b)^2]
-        res = a * b * (1000 - a - b)
 
+    let res = a * b * (1000 - a - b)
     putStrLn $ assertEq res 31875000 "p009"
 
 
@@ -129,40 +125,39 @@ p011 = do
     inputStr <- getData "p011.txt"
     let grid = fillGrid inputStr
         res = maximum [prodMax $ direction grid | direction <- [east, south, southEast, southWest]]
-
-        -- read input data string and fill grid
-        fillGrid :: String -> [[Int]]
-        fillGrid = map (map read . words) . lines
-
-        -- remove candidates with less than 4 elements
-        prune :: [[Int]] ->[[Int]]
-        prune = filter (\ys -> length ys == 4)
-
-        -- horizontal candidates
-        east :: [[Int]] ->[[Int]]
-        east = prune . concatMap (map (take 4) . tails)
-
-        -- vertical candidates
-        south :: [[Int]] ->[[Int]]
-        south = east . transpose
-
-        -- grab half the diagonals
-        diagonal :: [[Int]] -> [[Int]]
-        diagonal = south . zipWith drop [0 ..]
-
-        -- east half of diagonals
-        southEast :: [[Int]] -> [[Int]]
-        southEast = concatMap diagonal . tails
-
-        -- west half of diagonals
-        southWest :: [[Int]] -> [[Int]]
-        southWest = southEast . map reverse
-
-        -- product maximum of a list of candidates
-        prodMax :: [[Int]] -> Int
-        prodMax = maximum . map product
-
     putStrLn $ assertEq res 70600674 "p011"
+
+-- read input data string and fill grid
+fillGrid :: String -> [[Int]]
+fillGrid = map (map read . words) . lines
+
+-- remove candidates with less than 4 elements
+prune :: [[Int]] ->[[Int]]
+prune = filter (\ys -> length ys == 4)
+
+-- horizontal candidates
+east :: [[Int]] ->[[Int]]
+east = prune . concatMap (map (take 4) . tails)
+
+-- vertical candidates
+south :: [[Int]] ->[[Int]]
+south = east . transpose
+
+-- grab half the diagonals
+diagonal :: [[Int]] -> [[Int]]
+diagonal = south . zipWith drop [0 ..]
+
+-- east half of diagonals
+southEast :: [[Int]] -> [[Int]]
+southEast = concatMap diagonal . tails
+
+-- west half of diagonals
+southWest :: [[Int]] -> [[Int]]
+southWest = southEast . map reverse
+
+-- product maximum of a list of candidates
+prodMax :: [[Int]] -> Int
+prodMax = maximum . map product
 
 
 -------------------------------------------------------
@@ -171,7 +166,6 @@ p012 :: IO ()
 p012 = do
     let natSums = drop 1 $ scanl (+) 0 [1..]
         res =  head [x | x <- drop 1 natSums, length (factors x) > 500]
-
     putStrLn $ assertEq res 76576500 "p012"
 
 
@@ -182,8 +176,6 @@ p013 = do
     inputStr <- getData "p013.txt"
     let xs = sum $ map (\s -> read s :: Integer) $   lines inputStr
         res = read (take 10 $ show xs) :: Integer
-
-
     putStrLn $ assertEq res 5537376230 "p013"
 
 
@@ -194,9 +186,50 @@ p014 = do
     let res = maxCollatz 1000000
     putStrLn $ assertEq res 837799 "p014"
 
+-- vector based dynamic solution
 maxCollatz :: Int -> Int
--- maxCollatz n =   maximum . map swap $ assocs $ runSTUArray $ do
-maxCollatz n = arr' ! 1 where
+maxCollatz n = runST $ do
+    mVec <- M.replicate (n + 1) 0
+    idx  <- newSTRef 1              -- mutable loop counting index
+    best <- newSTRef (0 :: Int)     -- mutable best collatz score
+
+    let collatz x
+            | x == 1 = return 1
+            | x > n  = go x
+            | otherwise = do
+                cached <- M.read mVec x
+                if cached == 0 then go x else return cached
+                    where go x
+                            | even x    = fmap (+ 1) (collatz (x `div` 2))
+                            | otherwise = fmap (+ 1) (collatz (3 * x + 1))
+
+        loop = do
+            i <- readSTRef idx
+            case i of
+                  k | k > n     -> return mVec
+                    | otherwise -> do
+                        val <- M.read mVec i
+                        -- add new item to cache
+                        when (val == 0) $ do
+                            res <- collatz i
+                            M.write mVec i res
+                            -- save the index of the best result
+                            best' <- readSTRef best
+                            when (res > best') $ do
+                                M.write mVec 0 i
+                                modifySTRef' best (const res)
+                        modifySTRef' idx (+ 1)
+                        loop
+    -- start the loop
+    loop
+
+    -- done looping, retun answer
+    M.read mVec 0
+
+-- alternative array solution
+-- similar but slightly slower than vector
+maxCollatz' :: Int -> Int
+maxCollatz' n = arr' ! 1 where
         arr' =  runSTUArray $ do
             arr  <- newArray (1, n + 1) 0
             idx  <- newSTRef 1
@@ -212,7 +245,6 @@ maxCollatz n = arr' ! 1 where
                                     | even x    = fmap (+ 1) (collatz (x `div` 2))
                                     | otherwise = fmap (+ 1) (collatz (3 * x + 1))
 
-                -- get collatz(i) for i = [1..n]
                 loop = do
                     i <- readSTRef idx
                     case i of
@@ -260,24 +292,25 @@ p017 :: IO ()
 p017 = do
     let str = concat [numToWords n | n <- [1..1000]]
         res = length $ filter (not . isSpace) str
-
-        numToWords :: Int -> String
-        numToWords n
-            | n <       0 = ""
-            | n <      20 = numUntis !!  n
-            | n <     100 = numTens  !! (n `div` 10)     ++ " "          ++ numToWords (n `mod` 10)
-            | n <    1000 = numUntis !! (n `div` 100)    ++ numAnds n    ++ numToWords (n `mod` 100)
-            | n <   10000 = numUntis !! (n `div` 1000)   ++ " thousand " ++ numToWords (n `mod` 1000)
-            | n <  100000 = numTens  !! (n `div` 10000)  ++ " thousand " ++ numToWords (n `mod` 10000)
-            | n < 1000000 = numUntis !! (n `div` 100000) ++ " million "  ++ numToWords (n `mod` 100000)
-            | otherwise = ""
-                where
-                    numUntis = ["", "one", "two", "three", "four", "five", "six", "seven", "eight", "nine", "ten", "eleven",
-                                "twelve", "thirteen", "fourteen", "fifteen", "sixteen", "seventeen", "eighteen", "nineteen"]
-                    numTens = ["", "ten", "twenty", "thirty", "forty", "fifty", "sixty", "seventy", "eighty", "ninety"]
-                    numAnds n = if n `mod` 100 == 0 then " hundred " else " hundred and "
-
     putStrLn $ assertEq res 21124 "p017"
+
+-- number to string wording
+numToWords :: Int -> String
+numToWords n
+    | n <       0 = ""
+    | n <      20 = numUntis !!  n
+    | n <     100 = numTens  !! (n `div` 10)     ++ " "          ++ numToWords (n `mod` 10)
+    | n <    1000 = numUntis !! (n `div` 100)    ++ numAnds n    ++ numToWords (n `mod` 100)
+    | n <   10000 = numUntis !! (n `div` 1000)   ++ " thousand " ++ numToWords (n `mod` 1000)
+    | n <  100000 = numTens  !! (n `div` 10000)  ++ " thousand " ++ numToWords (n `mod` 10000)
+    | n < 1000000 = numUntis !! (n `div` 100000) ++ " million "  ++ numToWords (n `mod` 100000)
+    | otherwise = ""
+        where
+            numUntis = ["", "one", "two", "three", "four", "five", "six", "seven", "eight", "nine", "ten", "eleven",
+                        "twelve", "thirteen", "fourteen", "fifteen", "sixteen", "seventeen", "eighteen", "nineteen"]
+            numTens = ["", "ten", "twenty", "thirty", "forty", "fifty", "sixty", "seventy", "eighty", "ninety"]
+            numAnds n = if n `mod` 100 == 0 then " hundred " else " hundred and "
+
 
 
 -------------------------------------------------------
@@ -286,62 +319,69 @@ p018 :: IO ()
 p018 = do
     xss <- getData "p018.txt"
 
-    let res = sum . head . go . reverse $ fillLists xss
-
-        fillLists :: String -> [[Int]]
+    let fillLists :: String -> [[Int]]
         fillLists = map (map read . words) . lines
-
-        maxPair :: [Int] -> [Int]
-        maxPair xs = zipWith max xs (drop 1 xs)
-
-        sumTwoRows :: [Int] -> [Int] -> [Int]
-        sumTwoRows xs = zipWith (+) (maxPair xs)
-
-        go :: [[Int]] -> [[Int]]
-        go xss@(xs:ys:zs) =
-            case length xss of
-                0 -> []
-                1 -> [head xss]
-                2 -> [sumTwoRows xs ys]
-                _ -> go (sumTwoRows xs ys : zs)
-
+        res = sum . head . go . reverse $ fillLists xss
     putStrLn $ assertEq res 1074 "p019"
+
+-- max value of adjacent cells [4,2,3,5] -> [4, 3, 5]
+maxPair :: [Int] -> [Int]
+maxPair xs = zipWith max xs (drop 1 xs)
+
+-- sum 2 lists [1,2,3] -> [2,3,4] -> [3,5,7]
+sumTwoRows :: [Int] -> [Int] -> [Int]
+sumTwoRows xs = zipWith (+) (maxPair xs)
+
+-- process the triangle
+go :: [[Int]] -> [[Int]]
+go xss@(xs:ys:zs) =
+    case length xss of
+        0 -> []
+        1 -> [head xss]
+        2 -> [sumTwoRows xs ys]
+        _ -> go (sumTwoRows xs ys : zs)
 
 
 -------------------------------------------------------
 -- Euler 019:
 p019 :: IO ()
 p019 = do
-    let leap = [1904, 1908, 1912, 1916, 1920, 1924, 1928, 1932, 1936, 1940, 1944, 1948, 1952, 1956, 1960,
-                1964, 1968, 1972, 1976, 1980, 1984, 1988, 1992, 1996, 2000, 2004, 2008, 2012, 2016, 2020]
-        days y
-            | y `elem` leap = [31, 29, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31]
-            | otherwise     = [31, 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31]
-
-        months :: [Int]
-        months = [d | y <- [1900..2000], d <- days y]
-
-        lastDayofMonth :: Int -> Int -> Int
-        lastDayofMonth seed mDays
-                | mDays + seed > 7 = lastDayofMonth seed (mDays - 7)
-                | otherwise        = seed + mDays
-
-
-        dows :: [Int] -> [Int]
-        dows xs = drop 12 $ init $ scanl lastDayofMonth 2 xs
-
     let res = length $ filter (==1) $ dows months
     putStrLn $ assertEq res 171 "p019"
+
+-- leap years
+leap = [1904, 1908, 1912, 1916, 1920, 1924, 1928, 1932, 1936, 1940, 1944, 1948, 1952, 1956, 1960,
+        1964, 1968, 1972, 1976, 1980, 1984, 1988, 1992, 1996, 2000, 2004, 2008, 2012, 2016, 2020]
+
+-- days in each month
+days y
+    | y `elem` leap = [31, 29, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31]
+    | otherwise     = [31, 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31]
+
+-- list of days for all months and all years
+months :: [Int]
+months = [d | y <- [1900..2000], d <- days y]
+
+-- given start day 1 to 7 (1 == Sunday) and number of days, return last day of month
+lastDayofMonth :: Int -> Int -> Int
+lastDayofMonth seed mDays
+        | mDays + seed > 7 = lastDayofMonth seed (mDays - 7)
+        | otherwise        = seed + mDays
+
+-- list with start day (1 to 7) for all months and all years
+dows :: [Int] -> [Int]
+dows xs = drop 12 $ init $ scanl lastDayofMonth 2 xs
 
 
 -------------------------------------------------------
 -- Euler 020:
 p020 :: IO ()
 p020 = do
-    let res = 0
-    putStrLn $ assertEq res 1 "p020"
+    let res = sum . digits $ product [1..100]
+    putStrLn $ assertEq res 648 "p020"
 
 
+-- solution list to send to main for parallel execution
 solutionsP001_020 :: [IO()]---------------------
 solutionsP001_020 =
     [ p001, p002, p003, p004, p005, p006, p007, p008, p009, p010
