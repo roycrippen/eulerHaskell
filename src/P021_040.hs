@@ -43,6 +43,14 @@ p023 = do
     putStrLn $ assertEq res 0 "p023"
 
 
+
+isAbundant :: Int -> Bool
+isAbundant n = sumFactors n > n
+
+xs :: [(Int, Bool)]
+xs = [(x, isAbundant x) | x <- [1..50]]
+
+
 -------------------------------------------------------
 -- Euler 024:
 p024 :: IO ()
