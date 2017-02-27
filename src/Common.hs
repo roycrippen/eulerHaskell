@@ -9,6 +9,8 @@ module Common
     , groupPrimeFactors
     , sumFactors
     , sumFactorsStream
+    , splitOn
+    , toIntChars
     ) where
 
 import           Control.Arrow       ((&&&))
@@ -34,6 +36,23 @@ getData name = do
     file <- getDataFileName $ "data/" ++ name
     -- print file
     readFile file
+
+
+-------------------------------------------------------
+-- list of strings from splitting string on delim
+splitOn :: Char -> String -> [String]
+splitOn _ [] = [""]
+splitOn delim (c:cs)
+   | c == delim = "" : rest
+   | otherwise = (c : head rest) : tail rest
+   where
+       rest = splitOn delim cs
+
+
+-------------------------------------------------------
+-- int list of ascii value of string
+toIntChars :: String -> [Int]
+toIntChars = map (\ c -> fromEnum c - 64)
 
 
 -------------------------------------------------------
