@@ -1,28 +1,38 @@
 module P021_040 where
 
-import           Common (assertEq, sumFactors, sumFactorsStream)
-
+import           Common    (assertEq, getData, splitOn, sumFactors, toIntChars)
+import           Data.List (sort)
 
 -------------------------------------------------------
 -- Euler 021: Amicable numbers
 p021 :: IO ()
 p021 = do
-    let res = sum $ amics 10000
+    let res = amics 10000
     putStrLn $ assertEq res 31626 "p021"
 
--- list of all amicable numbers from 1 to n
-amics :: Integer -> [Integer]
-amics n = map snd $ filter predicate xs
-            where xs = zip [0..n] sumFactorsStream
-                  predicate (i, item) = item < n && i /= item && i == snd (xs !! fromIntegral item)
+-- truen is n is amicable
+isAmic :: Integer -> Bool
+isAmic n = sumFactors v == n && v /= n
+    where v = sumFactors n
 
+-- sum of all amicables from 1 to n
+amics :: Integer -> Integer
+amics n = sum $ filter isAmic [1..n]
 
 -------------------------------------------------------
 -- Euler 022:
 p022 :: IO ()
 p022 = do
-    let res  = 0
-    putStrLn $ assertEq res 0 "p022"
+    inputStr <- getData "p022.txt"
+    let xs = sort $  splitOn ',' ys
+            where ys = filter (/= '\"') inputStr
+
+    let res = sum $ zipWith (\str i -> i * scoreName str) xs [1..]
+    putStrLn $ assertEq res 871198282 "p022"
+
+-- score each name in list by index
+scoreName :: String -> Int
+scoreName = sum . toIntChars
 
 
 -------------------------------------------------------
