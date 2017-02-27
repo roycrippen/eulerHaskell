@@ -96,25 +96,25 @@ digits = reverse . unfoldr (\x -> if x == 0 then Nothing else Just (mod x 10, di
 
 -------------------------------------------------------
 -- tupled group primeFactors [(prime, count), ...], groupPrimeFactors 28 == [(2,2),(7,1)]
-groupPrimeFactors :: Integer -> [(Integer, Int)]
+groupPrimeFactors :: (Integral a) => a -> [(a, Int)]
 groupPrimeFactors = map (head &&& length) . group . primeFactors
 
 
 -------------------------------------------------------
 -- list of factors of a number, factors 28 == [1,7,2,14,4,28]
-factors :: Integer -> [Integer]
+factors :: (Integral a) => a -> [a]
 factors = map product . mapM (\(p,m) -> [p^i | i <- [0..m]]) . groupPrimeFactors
 
 
 -------------------------------------------------------
 -- sum of the factor of n not including n
-sumFactors :: Integer -> Integer
+sumFactors :: (Integral a) => a -> a
 sumFactors 0 = 0
 sumFactors n = sum (factors n) - n
 
 
 -------------------------------------------------------
 -- stream of sum of factors from 0 to n
-sumFactorsStream :: [Integer]
+sumFactorsStream :: (Integral a) => [a]
 sumFactorsStream = map sumFactors [0..]
 
