@@ -10,7 +10,7 @@ palindromTest = do
 
 collatzTest = maxCollatz 1023 == maxCollatz' 1023
 
-main :: IO ()barcelona vs atletico madrid
+main :: IO ()
 main = do
     palindromTest
     putStrLn $ "maxCollatz test = " ++ show collatzTest
