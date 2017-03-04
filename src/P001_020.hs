@@ -1,6 +1,6 @@
 module P001_020 where
 
-import           Common                      (assertEq, digits, factors, fibs, getData, isPalindrome)
+import           Common                      (assertEq, digits, factors, fibs, getData, isPalindrome, numDivisors)
 import           Control.Monad               (when)
 import           Control.Monad.ST            (runST)
 import           Data.Array.ST               (STUArray, newArray, readArray, runSTUArray, writeArray)
@@ -159,13 +159,12 @@ southWest = southEast . map reverse
 prodMax :: [[Int]] -> Int
 prodMax = maximum . map product
 
-
 -------------------------------------------------------
 -- Euler 012: Highly divisible triangular number
 p012 :: IO ()
 p012 = do
     let natSums = drop 1 $ scanl (+) 0 [1..]
-        res =  head [x | x <- drop 1 natSums, length (factors x) > 500]
+        res =  head [x | x <- drop 1 natSums, numDivisors x > 500]
     putStrLn $ assertEq res 76576500 "p012"
 
 
@@ -174,7 +173,7 @@ p012 = do
 p013 :: IO ()
 p013 = do
     inputStr <- getData "p013.txt"
-    let xs = sum $ map (\s -> read s :: Integer) $   lines inputStr
+    let xs = sum $ map (\s -> read s :: Integer) $ lines inputStr
         res = read (take 10 $ show xs) :: Integer
     putStrLn $ assertEq res 5537376230 "p013"
 

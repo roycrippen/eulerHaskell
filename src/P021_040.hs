@@ -17,12 +17,12 @@ p021 = do
 
 -- True if n is amicable.
 isAmic :: Integer -> Bool
-isAmic n = sumFactors v == n && v /= n
+isAmic n = v /= n && sumFactors v == n
     where v = sumFactors n
 
 -- sum of all amicable number from 1 to n
 amics :: Integer -> Integer
-amics n = sum $ filter isAmic [1..n]
+amics n = sum $ filter isAmic [2,4..n]
 
 -- | Euler 022: Names scores.
 p022 :: IO ()
@@ -54,7 +54,7 @@ isAbundant n = sumFactors n > n
 fillArray :: Int -> U.UArray Int Bool
 fillArray n = U.listArray (1, n) $ map isAbundant [1..n]
 
--- list of abundant numbers
+-- list of abundant numbers in array
 fillAbundants :: U.UArray Int Bool -> [Int]
 fillAbundants arrAll = filter (arrAll U.!) [1..n]
     where n = snd $ U.bounds arrAll

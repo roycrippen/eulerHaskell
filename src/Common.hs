@@ -8,6 +8,7 @@ module Common
     , isPalindrome
     , digits
     , factors
+    , numDivisors
     , groupPrimeFactors
     , sumFactors
     , sumFactorsStream
@@ -43,7 +44,7 @@ splitOn delim (c:cs)
    where
        rest = splitOn delim cs
 
--- | Int list of the ascii value each charater of string.
+-- | Int list of the ascii value each character of string.
 --
 -- > toIntChars "abc" == [33,34,35]
 toIntChars :: String -> [Int]
@@ -86,7 +87,7 @@ isPalindrome xs    = head xs == last xs && xs == reverse xs
 digits :: Integer -> [Integer]
 digits = reverse . unfoldr (\x -> if x == 0 then Nothing else Just (mod x 10, div x 10))
 
--- | Returns a tupled group list of prime factors of n [(prime, count), ...].
+-- | Returns a tuple group list of prime factors of n [(prime, count), ...].
 --
 -- > groupPrimeFactors 28 == [(2,2),(7,1)]
 groupPrimeFactors :: (Integral a) => a -> [(a, Int)]
@@ -97,6 +98,12 @@ groupPrimeFactors = map (head &&& length) . group . primeFactors
 -- > factors 28 == [1,7,2,14,4,28]
 factors :: (Integral a) => a -> [a]
 factors = map product . mapM (\(p,m) -> [p^i | i <- [0..m]]) . groupPrimeFactors
+
+-- | List of factors of a number.
+--
+-- > numDivisors 28 == 6
+numDivisors :: Int -> Int
+numDivisors n = product $ map ((+1) . length) (group (primeFactors n))
 
 -- | Sum of the factor of n not including n.
 --
