@@ -12,9 +12,11 @@ module Common
     , groupPrimeFactors
     , sumFactors
     , sumFactorsStream
+    , cartesianProduct
     ) where
 
 import           Control.Arrow       ((&&&))
+import           Control.Monad       (liftM2)
 import           Data.Array.ST
 import           Data.List           (group, unfoldr)
 import           Data.Numbers.Primes (primeFactors)
@@ -38,11 +40,11 @@ getData name = do
 -- > splitOn ',' "one, two, three" == ["one","two","three"]
 splitOn :: Char -> String -> [String]
 splitOn _ [] = [""]
-splitOn delim (c:cs)
-   | c == delim = "" : rest
+splitOn delimit (c:cs)
+   | c == delimit = "" : rest
    | otherwise = (c : head rest) : tail rest
    where
-       rest = splitOn delim cs
+       rest = splitOn delimit cs
 
 -- | Int list of the ascii value each character of string.
 --
@@ -116,4 +118,11 @@ sumFactors n = sum (factors n) - n
 --
 -- > drop 25 $ take 30 sumFactorsStream == [6,16,13,28,1]
 sumFactorsStream :: (Integral a) => [a]
-sumFactorsStream = map sumFactors [0..]
+sumFactorsStream = map sumFactors [0 ..]
+
+-- | Cartesian product of two lists into a list of tuples.
+--
+-- > cartesianProduct [1..2] [1..2] == [(1,1),(1,2),(2,1),(2,2)]
+cartesianProduct :: [a] -> [b] -> [(a, b)]
+cartesianProduct  = liftM2 (,)
+

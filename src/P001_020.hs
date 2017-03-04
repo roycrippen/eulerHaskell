@@ -222,7 +222,7 @@ maxCollatz n = runST $ do
     -- start the loop
     loop
 
-    -- done looping, retun answer
+    -- done looping, return answer
     M.read mVec 0
 
 -- alternative array solution
@@ -297,13 +297,13 @@ p017 = do
 numToWords :: Int -> String
 numToWords n
     | n <       0 = ""
-    | n <      20 = numUntis !!  n
+    | n <      20 = numUnits !!  n
     | n <     100 = numTens  !! (n `div` 10)     ++ " "          ++ numToWords (n `mod` 10)
-    | n <    1000 = numUntis !! (n `div` 100)    ++ numAnds n    ++ numToWords (n `mod` 100)
-    | n <   10000 = numUntis !! (n `div` 1000)   ++ " thousand " ++ numToWords (n `mod` 1000)
+    | n <    1000 = numUnits !! (n `div` 100)    ++ numAnds n    ++ numToWords (n `mod` 100)
+    | n <   10000 = numUnits !! (n `div` 1000)   ++ " thousand " ++ numToWords (n `mod` 1000)
     | otherwise = ""
         where
-            numUntis = ["", "one", "two", "three", "four", "five", "six", "seven", "eight", "nine", "ten", "eleven",
+            numUnits = ["", "one", "two", "three", "four", "five", "six", "seven", "eight", "nine", "ten", "eleven",
                         "twelve", "thirteen", "fourteen", "fifteen", "sixteen", "seventeen", "eighteen", "nineteen"]
             numTens = ["", "ten", "twenty", "thirty", "forty", "fifty", "sixty", "seventy", "eighty", "ninety"]
             numAnds n = if n `mod` 100 == 0 then " hundred " else " hundred and "
@@ -360,14 +360,14 @@ months :: [Int]
 months = [d | y <- [1900..2000], d <- days y]
 
 -- given start day 1 to 7 (1 == Sunday) and number of days, return last day of month
-lastDayofMonth :: Int -> Int -> Int
-lastDayofMonth seed mDays
-        | mDays + seed > 7 = lastDayofMonth seed (mDays - 7)
+lastDayOfMonth :: Int -> Int -> Int
+lastDayOfMonth seed mDays
+        | mDays + seed > 7 = lastDayOfMonth seed (mDays - 7)
         | otherwise        = seed + mDays
 
 -- list with start day (1 to 7) for all months and all years
 dows :: [Int] -> [Int]
-dows xs = drop 12 $ init $ scanl lastDayofMonth 2 xs
+dows xs = drop 12 $ init $ scanl lastDayOfMonth 2 xs
 
 
 -------------------------------------------------------

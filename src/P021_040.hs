@@ -12,17 +12,17 @@ import           Data.List          (sort)
 -- | Euler 021: Amicable numbers.
 p021 :: IO ()
 p021 = do
-    let res = amics 10000
+    let res = amicable 10000
     putStrLn $ assertEq res 31626 "p021"
 
 -- True if n is amicable.
-isAmic :: Integer -> Bool
-isAmic n = v /= n && sumFactors v == n
+isAmicable :: Integer -> Bool
+isAmicable n = v /= n && sumFactors v == n
     where v = sumFactors n
 
 -- sum of all amicable number from 1 to n
-amics :: Integer -> Integer
-amics n = sum $ filter isAmic [2,4..n]
+amicable :: Integer -> Integer
+amicable n = sum $ filter isAmicable [2,4..n]
 
 -- | Euler 022: Names scores.
 p022 :: IO ()
@@ -54,18 +54,17 @@ isAbundant n = sumFactors n > n
 fillArray :: Int -> U.UArray Int Bool
 fillArray n = U.listArray (1, n) $ map isAbundant [1..n]
 
--- list of abundant numbers in array
-fillAbundants :: U.UArray Int Bool -> [Int]
-fillAbundants arrAll = filter (arrAll U.!) [1..n]
+-- list of abundant numbers found in array
+getAbundants :: U.UArray Int Bool -> [Int]
+getAbundants arrAll = filter (arrAll U.!) [1..n]
     where n = snd $ U.bounds arrAll
 
-abunArr = fillArray 100
-abuns = fillAbundants abunArr
+abundants = getAbundants (fillArray 100)
 
-first = take (length abuns `div` 2) abuns
-rest = drop (length abuns `div` 2) abuns
+first = take (length  abundants `div` 2) abundants
+rest = drop (length abundants `div` 2) abundants
 
--- nonSums = [x-y | x<- abuns, y <- [1..num] ,x-y> 0 , not $ arrAll U.! (x-y)]               -- arrAll U.! (x+y)]
+-- nonSums = [x-y | x<- abundants, y <- [1..num] ,x-y> 0 , not $ arrAll U.! (x-y)]               -- arrAll U.! (x+y)]
 
 
 
