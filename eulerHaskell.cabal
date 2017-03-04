@@ -21,6 +21,7 @@ library
                      , primes
                      , array
                      , vector
+                     , permutation
   default-language:    Haskell2010
 
 executable eulerHaskell-exe

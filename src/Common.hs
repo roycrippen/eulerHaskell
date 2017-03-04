@@ -1,16 +1,16 @@
 module Common
-    ( fib
-    , fibs
-    , assertEq
+    ( assertEq
     , getData
+    , splitOn
+    , toIntChars
+    , fib
+    , fibs
     , isPalindrome
     , digits
     , factors
     , groupPrimeFactors
     , sumFactors
     , sumFactorsStream
-    , splitOn
-    , toIntChars
     ) where
 
 import           Control.Arrow       ((&&&))
@@ -19,27 +19,22 @@ import           Data.List           (group, unfoldr)
 import           Data.Numbers.Primes (primeFactors)
 import           Paths_eulerHaskell
 
-
--------------------------------------------------------
--- test if solution is correct and create response
+-- | Report if solution is correct and create response.
 assertEq :: (Show a, Eq a) => a -> a -> String -> String
 assertEq a b str =
     if a /= b
     then "ERROR: " ++ str ++ " answer " ++ show a ++ " not equal to " ++ show b
     else str ++ " = " ++ show a
 
-
--------------------------------------------------------
--- read data from text file
+-- | Read data from text file to an IO String.
 getData :: String -> IO String
 getData name = do
     file <- getDataFileName $ "data/" ++ name
-    -- print file
     readFile file
 
-
--------------------------------------------------------
--- list of strings from splitting string on delim
+-- | Split string on delimiter returning a list of strings.
+--
+-- > splitOn ',' "one, two, three" == ["one","two","three"]
 splitOn :: Char -> String -> [String]
 splitOn _ [] = [""]
 splitOn delim (c:cs)
@@ -48,15 +43,15 @@ splitOn delim (c:cs)
    where
        rest = splitOn delim cs
 
-
--------------------------------------------------------
--- int list of ascii value of string
+-- | Int list of the ascii value each charater of string.
+--
+-- > toIntChars "abc" == [33,34,35]
 toIntChars :: String -> [Int]
 toIntChars = map (\ c -> fromEnum c - 64)
 
-
--------------------------------------------------------
--- pretty quick individaul fibonacci function
+-- | Return fibonacci number of n.
+--
+-- > fib 25 == 75025
 fib :: Int -> Integer
 fib n
     | n < 1 = 0
@@ -69,52 +64,49 @@ fib' n = if even n then (p, q) else (p + q, p)
           p = (2 * b + a) * a
           q = a * a + b * b
 
-
--------------------------------------------------------
--- stream list of fibonacci numbers
--- from https://wiki.haskell.org/The_Fibonacci_sequence
-
+-- | Returns a stream of fibonacci numbers. From https://wiki.haskell.org/The_Fibonacci_sequence
+--
+-- > drop 20 (take 26 fibs) == [6765,10946,17711,28657,46368,75025]
+fibs :: [Integer]
 fibs = unfoldr (\(a,b) -> Just (a,(b,a+b))) (0,1)
 
-
--------------------------------------------------------
--- does list contain a palindrome; read same from and back
--- [9,0,0,9] == True
+-- | Returns if list contain a palindrome (read same from and back).
+--
+-- > isPalindrome [9,0,0,9] == True
 isPalindrome :: Eq a => [a] -> Bool
 isPalindrome []    = False
 isPalindrome [x]   = False
 isPalindrome [x,y] = x == y
 isPalindrome xs    = head xs == last xs && xs == reverse xs
 
-
--------------------------------------------------------
--- Integer number to list of digits
--- from http://stackoverflow.com/questions/3963269/split-a-number-into-its-digits-with-haskell
+-- | Integer number to list of digits.
+-- From http://stackoverflow.com/questions/3963269/split-a-number-into-its-digits-with-haskell
+--
+-- > digits 123 == [1,2,3]
 digits :: Integer -> [Integer]
 digits = reverse . unfoldr (\x -> if x == 0 then Nothing else Just (mod x 10, div x 10))
 
-
--------------------------------------------------------
--- tupled group primeFactors [(prime, count), ...], groupPrimeFactors 28 == [(2,2),(7,1)]
+-- | Returns a tupled group list of prime factors of n [(prime, count), ...].
+--
+-- > groupPrimeFactors 28 == [(2,2),(7,1)]
 groupPrimeFactors :: (Integral a) => a -> [(a, Int)]
 groupPrimeFactors = map (head &&& length) . group . primeFactors
 
-
--------------------------------------------------------
--- list of factors of a number, factors 28 == [1,7,2,14,4,28]
+-- | List of factors of a number.
+--
+-- > factors 28 == [1,7,2,14,4,28]
 factors :: (Integral a) => a -> [a]
 factors = map product . mapM (\(p,m) -> [p^i | i <- [0..m]]) . groupPrimeFactors
 
-
--------------------------------------------------------
--- sum of the factor of n not including n
+-- | Sum of the factor of n not including n.
+--
+-- > sumFactors 28 == 28
 sumFactors :: (Integral a) => a -> a
 sumFactors 0 = 0
 sumFactors n = sum (factors n) - n
 
-
--------------------------------------------------------
--- stream of sum of factors from 0 to n
+-- | Stream of sum of factors from 0.
+--
+-- > drop 25 $ take 30 sumFactorsStream == [6,16,13,28,1]
 sumFactorsStream :: (Integral a) => [a]
 sumFactorsStream = map sumFactors [0..]
-
