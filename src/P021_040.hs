@@ -11,7 +11,6 @@ import           Data.Choose
 import           Data.List
 import           Data.Numbers.Primes
 import           Data.Ratio
-import qualified Data.Set            as Set
 
 
 -- | Euler 021: Amicable numbers.
@@ -51,14 +50,14 @@ p023 = do
     let res = sum $ nonAbundants num
     putStrLn $ assertEq res 4179871 "p023"
 
--- end number
+-- number limit
 num :: Int
 num = 20161
 
 -- True for each abundant number
 arr :: U.UArray Int Bool
 arr = U.listArray (1, num) $ map isAbundant [1..num]
-    where isAbundant n = even n && sumFactors n > n
+    where isAbundant n = (even n || n `mod` 5 == 0) && sumFactors n > n
 
 -- list of abundant numbers found in array
 abundants :: [Int]
@@ -78,7 +77,6 @@ p024 :: IO ()
 p024 = do
     let res  = 0
     putStrLn $ assertEq res 0 "p024"
-
 
 -- > Euler 025:
 p025 :: IO ()
