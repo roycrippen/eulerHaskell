@@ -43,6 +43,7 @@ p022 = do
 scoreName :: String -> Int
 scoreName = sum . toIntChars
 
+------------------------------------------------------------------
 -- > Euler 023: Non-abundant sums.
 p023 :: IO ()
 p023 = do
@@ -77,7 +78,7 @@ p024 = do
     let res  = 0
     putStrLn $ assertEq res 0 "p024"
 
-
+------------------------------------------------------------------
 -- > Euler 025:
 p025 :: IO ()
 p025 = do
@@ -91,7 +92,7 @@ p026 = do
     let res  = 0
     putStrLn $ assertEq res 0 "p026"
 
-
+------------------------------------------------------------------
 -- > Euler 027:
 p027 :: IO ()
 p027 = do
