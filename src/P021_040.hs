@@ -48,37 +48,25 @@ scoreName = sum . toIntChars
 -- > Euler 023: Non-abundant sums.
 p023 :: IO ()
 p023 = do
-    let res  = sum $ nonAbundants num
+    let res = sum $ nonAbundants num
     putStrLn $ assertEq res 4179871 "p023"
 
 -- end number
 num :: Int
 num = 20161
 
--- True is n is abundant
-isAbundant :: Int -> Bool
-isAbundant n = sumFactors n > n
-
--- all True for each abundant number
-fillArray :: Int -> U.UArray Int Bool
-fillArray n = U.listArray (1, n) $ map isAbundant [1..n]
+-- True for each abundant number
+arr :: U.UArray Int Bool
+arr = U.listArray (1, num) $ map isAbundant [1..num]
+    where isAbundant n = even n && sumFactors n > n
 
 -- list of abundant numbers found in array
-getAbundants :: U.UArray Int Bool -> [Int]
-getAbundants arrAll = filter (arrAll U.!) [1..n]
-    where n = snd $ U.bounds arrAll
-
--- True / False of abundant numbers
-arr :: U.UArray Int Bool
-arr = fillArray num
-
--- list of abundants from 1 to num
 abundants :: [Int]
-abundants = getAbundants arr
+abundants = filter (arr U.!) [1..num]
 
--- is n the sum of abundant numbers, True or False
+-- is n the sum of two abundant numbers, True or False
 isAbundantSum :: Int -> Bool
-isAbundantSum n = any (\x -> arr U.! (n - x)) (takeWhile (< n) abundants)
+isAbundantSum n = any (\x -> arr U.! (n - x)) (takeWhile (<= n `div` 2) abundants)
 
 -- list of numbers that are not the sum of two abundant numbers
 nonAbundants :: Int -> [Int]
