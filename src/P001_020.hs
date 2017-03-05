@@ -1,8 +1,10 @@
 module P001_020 where
 
-import           Common                      (assertEq, digits, factors, fibs, getData, isPalindrome, numDivisors)
+import           Common                      (assertEq, digits, factors, fibs, getData, isPalindrome, numDivisors,
+                                              parMapChunked)
 import           Control.Monad               (when)
 import           Control.Monad.ST            (runST)
+import           Control.Parallel.Strategies
 import           Data.Array.ST               (STUArray, newArray, readArray, runSTUArray, writeArray)
 import           Data.Array.Unboxed          ((!))
 import           Data.Char                   (digitToInt, isSpace)
@@ -37,17 +39,19 @@ p003 = do
 -- | Euler 004: Largest palindrome product.
 p004 :: IO ()
 p004 = do
-    let res = foldl' max 0 [z | x <- [100..999] :: [Int],
-                           y <- [100..999],
-                           let z = x * y,
-                           (z `mod` 11 == 0) && isPalindrome (show z)]
+    let res :: Int
+        res = foldl' max 0 [z | x <- [100..999]
+                              , y <- [100..999]
+                              , let z = x * y
+                              , (z `mod` 11 == 0) && isPalindrome (show z)]
+
     putStrLn $ assertEq res 906609 "p004"
 
 ------------------------------------------------------------------
 -- | Euler 005: Smallest multiple.
 p005 :: IO ()
 p005 = do
-    let res = foldl lcm 1 [1..20]
+    let res = foldl' lcm 1 [1..20]
     putStrLn $ assertEq res 232792560 "p005"
 
 ------------------------------------------------------------------
@@ -55,7 +59,7 @@ p005 = do
 p006 :: IO ()
 p006 = do
     let sums = sum [1..100]
-        sumSquares = sum [x * x | x <- [1..100]]
+        sumSquares = foldl' (+) 0 [x * x | x <- [1..100]]
         res = sums * sums - sumSquares
     putStrLn $ assertEq res 25164150 "p006"
 
@@ -74,7 +78,7 @@ p008 = do
 
     let inputStr = filter (/= '\n') str
         chunks =  filter (/= "") (getChunks 13 inputStr)
-        res = maximum [productOfDigits xs | xs <- chunks]
+        res = foldl' max 0 [productOfDigits xs | xs <- chunks]
     putStrLn $ assertEq res 23514624000 "p008"
 
 -- break into chunks of n length strings
@@ -250,8 +254,8 @@ p015 :: IO ()
 p015 = do
     -- C(n,r) = n!/(r!(n-r)!)
     -- 40!/20!*20!
-    let fact20 = product [1..20] :: Integer
-        fact40 = foldr (*) fact20 [21..40]
+    let fact20 = foldl' (*) 1 [1..20] :: Integer
+        fact40 = foldl' (*) fact20 [21..40]
         res = fact40 `div` (fact20 * fact20)
     putStrLn $ assertEq res 137846528820 "p015"
 
@@ -259,7 +263,7 @@ p015 = do
 -- | Euler 016:
 p016 :: IO ()
 p016 = do
-    let res = sum . map digitToInt $ show (2^1000)
+    let res = foldl' (+) 0 (parMapChunked rseq 1000 digitToInt $ show (2^1000))
     putStrLn $ assertEq res 1366 "p016"
 
 ------------------------------------------------------------------

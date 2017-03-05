@@ -21,7 +21,7 @@ main = do
                 case n of
                     (Just x) ->
                         if x > 0 && x <= length solutions
-                            then solutions !! (x - 1 )
+                            then solutions !! (x - 1)
                             else putStrLn $ "Number not in range. " ++ msg
                     none -> putStrLn $ "Not a number" ++ msg
         _ -> putStrLn $ "One arg only. " ++ msg
