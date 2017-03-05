@@ -6,11 +6,13 @@ module P021_040 where
 
 import           Common
 import           Control.Monad
-import qualified Data.Array.Unboxed  as U
+import           Control.Parallel.Strategies (rseq)
+import qualified Data.Array.Unboxed          as U
 import           Data.Choose
 import           Data.List
 import           Data.Numbers.Primes
 import           Data.Ratio
+
 
 ------------------------------------------------------------------
 -- | Euler 021: Amicable numbers.
@@ -20,13 +22,13 @@ p021 = do
     putStrLn $ assertEq res 31626 "p021"
 
 -- True if n is amicable.
-isAmicable :: Integer -> Bool
+isAmicable :: Int -> Bool
 isAmicable n = v /= n && sumFactors v == n
     where v = sumFactors n
 
 -- sum of all amicable number from 1 to n
-amicable :: Integer -> Integer
-amicable n = sum $ filter isAmicable [2,4..n]
+amicable :: Int -> Int
+amicable n = foldl' (+) 0 $ filter isAmicable [2,4..n]
 
 ------------------------------------------------------------------
 -- | Euler 022: Names scores.
@@ -47,7 +49,7 @@ scoreName = sum . toIntChars
 -- > Euler 023: Non-abundant sums.
 p023 :: IO ()
 p023 = do
-    let res = sum $ nonAbundants num
+    let res = foldl' (+) 0 $ nonAbundants num
     putStrLn $ assertEq res 4179871 "p023"
 
 -- number limit
@@ -56,7 +58,7 @@ num = 20161
 
 -- True for each abundant number
 arr :: U.UArray Int Bool
-arr = U.listArray (1, num) $ map isAbundant [1..num]
+arr = U.listArray (1, num) (parMapChunked rseq 500 isAbundant [1..num])
     where isAbundant n = (even n || n `mod` 5 == 0) && sumFactors n > n
 
 -- list of abundant numbers found in array

@@ -6,7 +6,7 @@ import           Control.Monad.ST            (runST)
 import           Data.Array.ST               (STUArray, newArray, readArray, runSTUArray, writeArray)
 import           Data.Array.Unboxed          ((!))
 import           Data.Char                   (digitToInt, isSpace)
-import           Data.List                   (tails, transpose)
+import           Data.List                   (foldl', tails, transpose)
 import           Data.Numbers.Primes         (primeFactors, primes)
 import           Data.STRef                  (modifySTRef', newSTRef, readSTRef)
 import qualified Data.Vector.Unboxed.Mutable as M
@@ -37,7 +37,7 @@ p003 = do
 -- | Euler 004: Largest palindrome product.
 p004 :: IO ()
 p004 = do
-    let res = maximum [z | x <- [100..999],
+    let res = foldl' max 0 [z | x <- [100..999] :: [Int],
                            y <- [100..999],
                            let z = x * y,
                            (z `mod` 11 == 0) && isPalindrome (show z)]
@@ -104,7 +104,7 @@ p009 = do
 -- | Euler 010: Summation of primes.
 p010 :: IO ()
 p010 = do
-    let res = sum $ takeWhile (< 2000000) primes
+    let res = foldl' (+) 0 $ takeWhile (< 2000000) primes
     putStrLn $ assertEq res 142913828922 "p010"
 
 ------------------------------------------------------------------
@@ -175,9 +175,9 @@ p014 = do
 -- vector based dynamic solution
 maxCollatz :: Int -> Int
 maxCollatz n = runST $ do
-    mVec <- M.replicate (n + 1) 0   -- mutable vector as cache
-    idx  <- newSTRef 1              -- mutable loop counting index
-    best <- newSTRef (0 :: Int)     -- mutable best collatz score
+    mVec <- M.replicate (n + 1) 0   -- ^ mutable vector as cache
+    idx  <- newSTRef 1              -- ^ mutable loop counting index
+    best <- newSTRef (0 :: Int)     -- ^ mutable best collatz score
 
     let collatz x
             | x == 1 = return 1
@@ -195,22 +195,18 @@ maxCollatz n = runST $ do
                   k | k > n     -> return mVec
                     | otherwise -> do
                         val <- M.read mVec i
-                        -- add new item to cache
-                        when (val == 0) $ do
+                        when (val == 0) $ do         -- ^ add new item to cache
                             res <- collatz i
                             M.write mVec i res
-                            -- save the index of the best result
-                            best' <- readSTRef best
+                            best' <- readSTRef best  -- ^ save the index of the best result
                             when (res > best') $ do
                                 M.write mVec 0 i
                                 modifySTRef' best (const res)
                         modifySTRef' idx (+ 1)
                         loop
-    -- start the loop
-    loop
+    loop  -- ^ start the loop
 
-    -- done looping, return answer
-    M.read mVec 0
+    M.read mVec 0   -- ^ done looping, return answer
 
 -- alternative array solution
 -- similar but slightly slower than vector
@@ -237,19 +233,16 @@ maxCollatz' n = arr' ! 1 where
                           k | k > n     -> return arr
                             | otherwise -> do
                                 val <- readArray arr i
-                                -- add new item to cache
-                                when (val == 0) $ do
+                                when (val == 0) $ do         -- ^ add new item to cache
                                     res <- collatz i
                                     writeArray arr i res
-                                    -- save the index of the best result
-                                    best' <- readSTRef best
+                                    best' <- readSTRef best  -- ^ save the index of the best result
                                     when (res > best') $ do
                                         writeArray arr 1 i
                                         modifySTRef' best (const res)
                                 modifySTRef' idx (+ 1)
                                 loop
-            -- start the loop
-            loop
+            loop  -- ^ start the loop
 
 ------------------------------------------------------------------
 -- | Euler 015:

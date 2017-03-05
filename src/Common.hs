@@ -1,5 +1,6 @@
 module Common
     ( assertEq
+    , parMapChunked
     , getData
     , splitOn
     , toIntChars
@@ -15,11 +16,12 @@ module Common
     , cartesianProduct
     ) where
 
-import           Control.Arrow       ((&&&))
-import           Control.Monad       (liftM2)
+import           Control.Arrow               ((&&&))
+import           Control.Monad               (liftM2)
+import           Control.Parallel.Strategies (Strategy, parListChunk, withStrategy)
 import           Data.Array.ST
-import           Data.List           (group, unfoldr)
-import           Data.Numbers.Primes (primeFactors)
+import           Data.List                   (foldl', group, unfoldr)
+import           Data.Numbers.Primes         (primeFactors)
 import           Paths_eulerHaskell
 
 -- | Report if solution is correct and create response.
@@ -28,6 +30,17 @@ assertEq a b str =
     if a /= b
     then "ERROR: " ++ str ++ " answer " ++ show a ++ " not equal to " ++ show b
     else str ++ " = " ++ show a
+
+
+-- | convenience function to use parallel map in chunks
+parMapChunked
+    :: Strategy b -- ^ evaluation degree at each element
+    -> Int        -- ^ chunk size
+    -> (a -> b)   -- ^ function to apply to each element
+    -> [a]        -- ^ input list
+    -> [b]
+parMapChunked strategy i f = withStrategy (parListChunk i strategy) . map f
+
 
 -- | Read data from text file to an IO String.
 getData :: String -> IO String
@@ -98,10 +111,10 @@ groupPrimeFactors = map (head &&& length) . group . primeFactors
 -- | List of factors of a number.
 --
 -- > factors 28 == [1,7,2,14,4,28]
-factors :: (Integral a) => a -> [a]
+factors :: Int -> [Int]
 factors = map product . mapM (\(p,m) -> [p^i | i <- [0..m]]) . groupPrimeFactors
 
--- | List of factors of a number.
+-- | Factors count of a number.
 --
 -- > numDivisors 28 == 6
 numDivisors :: Int -> Int
@@ -110,14 +123,14 @@ numDivisors n = product $ map ((+1) . length) (group (primeFactors n))
 -- | Sum of the factor of n not including n.
 --
 -- > sumFactors 28 == 28
-sumFactors :: (Integral a) => a -> a
+sumFactors :: Int -> Int
 sumFactors 0 = 0
-sumFactors n = sum (factors n) - n
+sumFactors n = foldl' (+) 0 (factors n) - n
 
 -- | Stream of sum of factors from 0.
 --
 -- > drop 25 $ take 30 sumFactorsStream == [6,16,13,28,1]
-sumFactorsStream :: (Integral a) => [a]
+sumFactorsStream :: [Int]
 sumFactorsStream = map sumFactors [0 ..]
 
 -- | Cartesian product of two lists into a list of tuples.
