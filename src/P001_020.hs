@@ -11,34 +11,30 @@ import           Data.Numbers.Primes         (primeFactors, primes)
 import           Data.STRef                  (modifySTRef', newSTRef, readSTRef)
 import qualified Data.Vector.Unboxed.Mutable as M
 
-
--------------------------------------------------------
--- Euler 001: Multiples of 3 and 5
+------------------------------------------------------------------
+-- | Euler 001: Multiples of 3 and 5.
 p001 :: IO ()
 p001 = do
     let res = sum [x | x <- [3..999], x `mod` 3 == 0 || x `mod` 5 == 0]
     putStrLn $ assertEq res 233168 "p001"
 
-
--------------------------------------------------------
--- Euler 002: Even Fibonacci numbers
+------------------------------------------------------------------
+-- | Euler 002: Even Fibonacci numbers.
 p002 :: IO ()
 p002 = do
     let fibList = takeWhile (<= 4000000) fibs
         res  = sum . filter even $ fibList
     putStrLn $ assertEq res 4613732 "p002"
 
-
--------------------------------------------------------
--- Euler 003: Largest prime factor
+------------------------------------------------------------------
+-- | Euler 003: Largest prime factor.
 p003 :: IO ()
 p003 = do
     let res = maximum $ primeFactors 600851475143
     putStrLn $ assertEq res 6857 "p003"
 
-
--------------------------------------------------------
--- Euler 004: Largest palindrome product
+------------------------------------------------------------------
+-- | Euler 004: Largest palindrome product.
 p004 :: IO ()
 p004 = do
     let res = maximum [z | x <- [100..999],
@@ -47,17 +43,15 @@ p004 = do
                            (z `mod` 11 == 0) && isPalindrome (show z)]
     putStrLn $ assertEq res 906609 "p004"
 
-
--------------------------------------------------------
--- Euler 005: Smallest multiple
+------------------------------------------------------------------
+-- | Euler 005: Smallest multiple.
 p005 :: IO ()
 p005 = do
     let res = foldl lcm 1 [1..20]
     putStrLn $ assertEq res 232792560 "p005"
 
-
--------------------------------------------------------
--- Euler 006: Sum square difference
+------------------------------------------------------------------
+-- | Euler 006: Sum square difference.
 p006 :: IO ()
 p006 = do
     let sums = sum [1..100]
@@ -65,17 +59,15 @@ p006 = do
         res = sums * sums - sumSquares
     putStrLn $ assertEq res 25164150 "p006"
 
-
--------------------------------------------------------
--- Euler 007: 10001st prime
+------------------------------------------------------------------
+-- | Euler 007: 10001st prime.
 p007 :: IO ()
 p007 = do
     let res = last $ take 10001 primes
     putStrLn $ assertEq res 104743 "p007"
 
-
--------------------------------------------------------
--- Euler 008: Largest product in a series
+------------------------------------------------------------------
+-- | Euler 008: Largest product in a series.
 p008 :: IO ()
 p008 = do
     str <- getData "p008.txt"
@@ -97,9 +89,8 @@ getChunks n xs
 productOfDigits :: String -> Integer
 productOfDigits str = product $ digits (read str)
 
-
--------------------------------------------------------
--- Euler 009: Special Pythagorean triplet
+------------------------------------------------------------------
+-- | Euler 009: Special Pythagorean triplet.
 p009 :: IO ()
 p009 = do
     let (a,b) = head [(a,b) | a <- [2..500],
@@ -109,17 +100,15 @@ p009 = do
     let res = a * b * (1000 - a - b)
     putStrLn $ assertEq res 31875000 "p009"
 
-
--------------------------------------------------------
--- Euler 010: Summation of primes
+------------------------------------------------------------------
+-- | Euler 010: Summation of primes.
 p010 :: IO ()
 p010 = do
     let res = sum $ takeWhile (< 2000000) primes
     putStrLn $ assertEq res 142913828922 "p010"
 
-
--------------------------------------------------------
--- Euler 011: Largest product in a grid
+------------------------------------------------------------------
+-- | Euler 011: Largest product in a grid.
 p011 :: IO ()
 p011 = do
     inputStr <- getData "p011.txt"
@@ -159,17 +148,16 @@ southWest = southEast . map reverse
 prodMax :: [[Int]] -> Int
 prodMax = maximum . map product
 
--------------------------------------------------------
--- Euler 012: Highly divisible triangular number
+------------------------------------------------------------------
+-- | Euler 012: Highly divisible triangular number.
 p012 :: IO ()
 p012 = do
     let natSums = drop 1 $ scanl (+) 0 [1..]
         res =  head [x | x <- drop 1 natSums, numDivisors x > 500]
     putStrLn $ assertEq res 76576500 "p012"
 
-
--------------------------------------------------------
--- Euler 013: Large sum
+------------------------------------------------------------------
+-- | Euler 013: Large sum.
 p013 :: IO ()
 p013 = do
     inputStr <- getData "p013.txt"
@@ -177,9 +165,8 @@ p013 = do
         res = read (take 10 $ show xs) :: Integer
     putStrLn $ assertEq res 5537376230 "p013"
 
-
--------------------------------------------------------
--- Euler 014: Longest Collatz sequence
+------------------------------------------------------------------
+-- | Euler 014: Longest Collatz sequence.
 p014 :: IO ()
 p014 = do
     let res = maxCollatz 1000000
@@ -264,9 +251,8 @@ maxCollatz' n = arr' ! 1 where
             -- start the loop
             loop
 
-
--------------------------------------------------------
--- Euler 015:
+------------------------------------------------------------------
+-- | Euler 015:
 p015 :: IO ()
 p015 = do
     -- C(n,r) = n!/(r!(n-r)!)
@@ -276,17 +262,15 @@ p015 = do
         res = fact40 `div` (fact20 * fact20)
     putStrLn $ assertEq res 137846528820 "p015"
 
-
--------------------------------------------------------
--- Euler 016:
+------------------------------------------------------------------
+-- | Euler 016:
 p016 :: IO ()
 p016 = do
     let res = sum . map digitToInt $ show (2^1000)
     putStrLn $ assertEq res 1366 "p016"
 
-
--------------------------------------------------------
--- Euler 017:
+------------------------------------------------------------------
+-- | Euler 017:
 p017 :: IO ()
 p017 = do
     let str = concat [numToWords n | n <- [1..1000]]
@@ -308,10 +292,8 @@ numToWords n
             numTens = ["", "ten", "twenty", "thirty", "forty", "fifty", "sixty", "seventy", "eighty", "ninety"]
             numAnds n = if n `mod` 100 == 0 then " hundred " else " hundred and "
 
-
-
--------------------------------------------------------
--- Euler 018:
+------------------------------------------------------------------
+-- | Euler 018:
 p018 :: IO ()
 p018 = do
     xss <- getData "p018.txt"
@@ -338,9 +320,8 @@ go xss@(xs:ys:zs) =
         2 -> [sumTwoRows xs ys]
         _ -> go (sumTwoRows xs ys : zs)
 
-
--------------------------------------------------------
--- Euler 019:
+------------------------------------------------------------------
+-- | Euler 019:
 p019 :: IO ()
 p019 = do
     let res = length $ filter (==1) $ dows months
@@ -369,16 +350,14 @@ lastDayOfMonth seed mDays
 dows :: [Int] -> [Int]
 dows xs = drop 12 $ init $ scanl lastDayOfMonth 2 xs
 
-
--------------------------------------------------------
--- Euler 020:
+------------------------------------------------------------------
+-- | Euler 020:
 p020 :: IO ()
 p020 = do
     let res = sum . digits $ product [1..100]
     putStrLn $ assertEq res 648 "p020"
 
-
--- solution list to send to main for parallel execution
+-- | solution list to send to main for parallel execution
 solutionsP001_020 :: [IO()]---------------------
 solutionsP001_020 =
     [ p001, p002, p003, p004, p005, p006, p007, p008, p009, p010
