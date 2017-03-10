@@ -4,7 +4,7 @@ import           Common                      (assertEq, digits, factors, fibs, g
                                               parMapChunked)
 import           Control.Monad               (when)
 import           Control.Monad.ST            (runST)
-import           Control.Parallel.Strategies
+import           Control.Parallel.Strategies (rseq)
 import           Data.Array.ST               (STUArray, newArray, readArray, runSTUArray, writeArray)
 import           Data.Array.Unboxed          ((!))
 import           Data.Char                   (digitToInt, isSpace)
