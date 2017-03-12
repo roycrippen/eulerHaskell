@@ -77,27 +77,10 @@ nonAbundants n = filter(not . isAbundantSum) [1..n]
 -- > Euler 024: Lexicographic permutations.
 p024 :: IO ()
 p024 = do
-    let res :: Int
-        -- res  = read $ sort (permutations "0123456789") !! 999999
-        str = head $ take 1 $ drop 999999 $ iterate nextPerm "0123456789"
-        res = read str
+    let res = read $ nthLexPerm 999999 "0123456789"
     putStrLn $ assertEq res 2783915460 "p024"
 
-getFirstIndex :: String -> Int
-getFirstIndex s = last $ elemIndices 'a' (scanr1 (\r l ->  if r < l then 'a' else r) s)
-
-swap :: Eq a => a -> a -> [a] -> [a]
-swap a b = map (\x -> if x == a then b else if x == b then a else x)
-
-nextPerm :: String -> String
-nextPerm s = take pivot s'  ++ sort (drop pivot s')
-        where
-            firstIndex = getFirstIndex s
-            pivot = firstIndex + 1
-            firstChar = s !! firstIndex
-            lastChar = minimum $ filter (> firstChar) $ drop pivot s
-            s' = swap firstChar lastChar s
-
+-- nth lexicographic permutation of a list of items
 nthLexPerm :: Ord a => Int -> [a] -> [a]
 nthLexPerm n xs
     | length xs == 1 = xs
@@ -106,7 +89,6 @@ nthLexPerm n xs
                   groupIndex = n `div` smallPermutations
                   withinGroup = n `mod` smallPermutations
 
-
 factorial :: Int -> Int
 factorial n = product [1..n]
 
@@ -114,8 +96,8 @@ factorial n = product [1..n]
 -- > Euler 025:
 p025 :: IO ()
 p025 = do
-    let res  = 0
-    putStrLn $ assertEq res 0 "p025"
+    let res  = length $ takeWhile (\x -> length (show x) < 1000) fibs
+    putStrLn $ assertEq res 4782 "p025"
 
 ------------------------------------------------------------------
 -- > Euler 026:
