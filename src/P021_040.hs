@@ -8,11 +8,11 @@ import           Control.Monad
 import           Control.Parallel.Strategies (rseq)
 import qualified Data.Array.Unboxed          as U
 import           Data.Choose
+import           Data.Function
 import           Data.List
 import           Data.Maybe
 import           Data.Numbers.Primes
 import           Data.Ratio
-import Data.Function
 
 
 ------------------------------------------------------------------
@@ -127,8 +127,11 @@ p027 = do
 -- > Euler 028:
 p028 :: IO ()
 p028 = do
-    let res  = 0
-    putStrLn $ assertEq res 0 "p028"
+    let res  = diagSum 1001
+    putStrLn $ assertEq res 669171001 "p028"
+
+diagSum n = foldl' f 1  $ takeWhile (<= n) [3,5..]
+                where f acc i = acc + 4 * i * i - 6 * (i - 1)
 
 ------------------------------------------------------------------
 -- > Euler 029:
