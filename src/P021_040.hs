@@ -12,6 +12,7 @@ import           Data.List
 import           Data.Maybe
 import           Data.Numbers.Primes
 import           Data.Ratio
+import Data.Function
 
 
 ------------------------------------------------------------------
@@ -92,19 +93,28 @@ nthLexPerm n xs
 factorial :: Int -> Int
 factorial n = product [1..n]
 
-------------------------------------------------------------------
--- > Euler 025:
+-------------------------------------------------------
+-- Euler 025:
 p025 :: IO ()
 p025 = do
     let res  = length $ takeWhile (\x -> length (show x) < 1000) fibs
     putStrLn $ assertEq res 4782 "p025"
 
-------------------------------------------------------------------
--- > Euler 026:
+fibs2 = Data.Function.fix $ (0:) . scanl (+) 1
+digits1 = length . (show :: Integer -> String)
+
+r = fst . head . dropWhile ((1000>) . digits1 . snd) $ zip [0..] fibs2
+
+
+-------------------------------------------------------
+-- Euler 026:
 p026 :: IO ()
 p026 = do
-    let res  = 0
-    putStrLn $ assertEq res 0 "p026"
+    let res  = snd $ maximum [ (cycleCnt 1 d 1, d) | d <- takeWhile (< 1000) primes]
+    putStrLn $ assertEq res 983 "p026"
+
+cycleCnt :: Integer -> Integer-> Integer-> Integer
+cycleCnt n d cnt = if n + 1 == d || (10^n - 1) `mod` d == 0 then cnt else cycleCnt (n+1) d (cnt+1)
 
 ------------------------------------------------------------------
 -- > Euler 027:
