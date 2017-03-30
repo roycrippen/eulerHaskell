@@ -116,12 +116,18 @@ p026 = do
 cycleCnt :: Integer -> Integer-> Integer-> Integer
 cycleCnt n d cnt = if n + 1 == d || (10^n - 1) `mod` d == 0 then cnt else cycleCnt (n+1) d (cnt+1)
 
+
 ------------------------------------------------------------------
 -- > Euler 027:
 p027 :: IO ()
 p027 = do
-    let res  = 0
-    putStrLn $ assertEq res 0 "p027"
+    let res  = solve27 1000
+    putStrLn $ assertEq res (-59231) "p027"
+
+solve27 :: Int -> Int
+solve27 n = -(2 * a - 1) * (a^2 - a + 41)
+            where a = head (filter (\ x -> x ^ 2 - x + 41 > n) [1 ..]) - 1
+
 
 ------------------------------------------------------------------
 -- > Euler 028:
@@ -133,12 +139,14 @@ p028 = do
 diagSum n = foldl' f 1  $ takeWhile (<= n) [3,5..]
                 where f acc i = acc + 4 * i * i - 6 * (i - 1)
 
+
 ------------------------------------------------------------------
 -- > Euler 029:
 p029 :: IO ()
 p029 = do
     let res  = 0
     putStrLn $ assertEq res 0 "p029"
+
 
 ------------------------------------------------------------------
 -- > Euler 030:
@@ -147,12 +155,14 @@ p030 = do
     let res  = 0
     putStrLn $ assertEq res 0 "p030"
 
+
 ------------------------------------------------------------------
 -- > Euler 031:
 p031 :: IO ()
 p031 = do
     let res = 0
     putStrLn $ assertEq res 0 "p031"
+
 
 ------------------------------------------------------------------
 -- > Euler 032:
@@ -161,12 +171,14 @@ p032 = do
     let res  = 0
     putStrLn $ assertEq res 0 "p032"
 
+
 ------------------------------------------------------------------
 -- > Euler 033:
 p033 :: IO ()
 p033 = do
     let res  = 0
     putStrLn $ assertEq res 0 "p033"
+
 
 ------------------------------------------------------------------
 -- > Euler 034:
@@ -175,12 +187,14 @@ p034 = do
     let res  = 0
     putStrLn $ assertEq res 0 "p034"
 
+
 ------------------------------------------------------------------
 -- > Euler 035:
 p035 :: IO ()
 p035 = do
     let res  = 0
     putStrLn $ assertEq res 0 "p035"
+
 
 ------------------------------------------------------------------
 -- > Euler 036:
@@ -189,12 +203,14 @@ p036 = do
     let res  = 0
     putStrLn $ assertEq res 0 "p036"
 
+
 ------------------------------------------------------------------
 -- > Euler 037:
 p037 :: IO ()
 p037 = do
     let res  = 0
     putStrLn $ assertEq res 0 "p037"
+
 
 ------------------------------------------------------------------
 -- > Euler 038:
@@ -203,6 +219,7 @@ p038 = do
     let res  = 0
     putStrLn $ assertEq res 0 "p038"
 
+
 ------------------------------------------------------------------
 -- > Euler 039:
 p039 :: IO ()
@@ -210,12 +227,14 @@ p039 = do
     let res  = 0
     putStrLn $ assertEq res 0 "p039"
 
+
 ------------------------------------------------------------------
 -- > Euler 030:
 p040 :: IO ()
 p040 = do
     let res  = 0
     putStrLn $ assertEq res 0 "p040"
+
 
 ------------------------------------------------------------------
 -- > List of project Euler functions.
