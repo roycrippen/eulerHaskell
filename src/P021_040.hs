@@ -10,6 +10,7 @@ import           Data.List
 import           Data.Maybe
 import           Data.Numbers.Primes
 import           Data.Ratio
+import qualified Data.Set                    as S
 
 
 ------------------------------------------------------------------
@@ -137,8 +138,11 @@ diagSum n = foldl' f 1  $ takeWhile (<= n) [3,5..]
 -- > Euler 029:
 p029 :: IO ()
 p029 = do
-    let res  = 0
-    putStrLn $ assertEq res 0 "p029"
+    let res  = solve29 100
+    putStrLn $ assertEq res 9240 "p029"
+
+solve29 :: Double -> Int
+solve29 n = S.size $ S.fromList [b * log a | a <- [2..n], b <- [2..n]]
 
 ------------------------------------------------------------------
 -- > Euler 030:
