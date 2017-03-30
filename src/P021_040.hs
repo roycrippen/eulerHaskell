@@ -1,8 +1,5 @@
 module P021_040 where
-    -- ( p021, p022, p023, p024, p025, p026, p027, p028, p029, p030
-    -- , p031, p032, p033, p034, p035, p036, p037, p038, p039, p040
-    -- , solutionsP021_040
-    -- ) where
+
 import           Common
 import           Control.Monad
 import           Control.Parallel.Strategies (rseq)
