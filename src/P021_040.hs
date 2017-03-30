@@ -142,7 +142,7 @@ p029 = do
     putStrLn $ assertEq res 9240 "p029"
 
 solve29 :: Double -> Int
-solve29 n = S.size $ S.fromList [b * log a | a <- [2..n], b <- [2..n]]
+solve29 n = length $ S.fromList [b * log a | a <- [2..n], b <- [2..n]]
 
 ------------------------------------------------------------------
 -- > Euler 030:
