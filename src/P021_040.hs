@@ -2,7 +2,7 @@ module P021_040 where
 
 import           Common
 import           Control.Monad
-import           Control.Parallel.Strategies (rpar, rseq)
+import           Control.Parallel.Strategies (rseq)
 import qualified Data.Array.Unboxed          as U
 import           Data.Choose
 import           Data.Function
