@@ -1,6 +1,7 @@
 module Common
     ( assertEq
     , parMapChunked
+    , parFilterChunked
     , getData
     , splitOn
     , toIntChars
@@ -33,13 +34,26 @@ assertEq a b str =
 
 
 -- | convenience function to use parallel map in chunks
+-- | http://www.macs.hw.ac.uk/~rs46/posts/2016-05-29-skeletons-parallel-pragmas.html
 parMapChunked
     :: Strategy b -- ^ evaluation degree at each element
     -> Int        -- ^ chunk size
     -> (a -> b)   -- ^ function to apply to each element
     -> [a]        -- ^ input list
-    -> [b]
+    -> [b]        -- ^ result list
 parMapChunked strategy i f = withStrategy (parListChunk i strategy) . map f
+
+
+-- | convenience function to use parallel filter in chunks
+-- | not sure this speeds anything up
+parFilterChunked
+    :: Strategy a   -- ^ evaluation degree at each element
+    -> Int          -- ^ chunk size
+    -> (a -> Bool)  -- ^ function to apply to each element
+    -> [a]          -- ^ input list
+    -> [a]          -- ^ result list
+parFilterChunked strategy i f = withStrategy (parListChunk i strategy) . filter f
+
 
 
 -- | Read data from text file to an IO String.
@@ -99,7 +113,7 @@ isPalindrome xs    = head xs == last xs && xs == reverse xs
 -- From http://stackoverflow.com/questions/3963269/split-a-number-into-its-digits-with-haskell
 --
 -- > digits 123 == [1,2,3]
-digits :: Integer -> [Integer]
+digits :: Integral a => a -> [a]
 digits = reverse . unfoldr (\x -> if x == 0 then Nothing else Just (mod x 10, div x 10))
 
 -- | Returns a tuple group list of prime factors of n [(prime, count), ...].
@@ -138,4 +152,3 @@ sumFactorsStream = map sumFactors [0 ..]
 -- > cartesianProduct [1..2] [1..2] == [(1,1),(1,2),(2,1),(2,2)]
 cartesianProduct :: [a] -> [b] -> [(a, b)]
 cartesianProduct  = liftM2 (,)
-

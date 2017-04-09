@@ -2,7 +2,7 @@ module P021_040 where
 
 import           Common
 import           Control.Monad
-import           Control.Parallel.Strategies (rseq)
+import           Control.Parallel.Strategies (rpar, rseq)
 import qualified Data.Array.Unboxed          as U
 import           Data.Choose
 import           Data.Function
@@ -92,7 +92,7 @@ factorial :: Int -> Int
 factorial n = product [1..n]
 
 -------------------------------------------------------
--- Euler 025:
+-- Euler 025: 1000-digit Fibonacci number
 p025 :: IO ()
 p025 = do
     let res  = length $ takeWhile (\x -> length (show x) < 1000) fibs
@@ -104,7 +104,7 @@ digits1 = length . (show :: Integer -> String)
 r = fst . head . dropWhile ((1000>) . digits1 . snd) $ zip [0..] fibs2
 
 -------------------------------------------------------
--- Euler 026:
+-- Euler 026: Reciprocal cycles
 p026 :: IO ()
 p026 = do
     let res  = snd $ maximum [ (cycleCnt 1 d 1, d) | d <- takeWhile (< 1000) primes]
@@ -114,7 +114,7 @@ cycleCnt :: Integer -> Integer-> Integer-> Integer
 cycleCnt n d cnt = if n + 1 == d || (10^n - 1) `mod` d == 0 then cnt else cycleCnt (n+1) d (cnt+1)
 
 ------------------------------------------------------------------
--- > Euler 027:
+-- > Euler 027: Quadratic primes
 p027 :: IO ()
 p027 = do
     let res  = solve27 1000
@@ -125,7 +125,7 @@ solve27 n = -(2 * a - 1) * (a^2 - a + 41)
             where a = head (filter (\ x -> x ^ 2 - x + 41 > n) [1 ..]) - 1
 
 ------------------------------------------------------------------
--- > Euler 028:
+-- > Euler 028: Number spiral diagonals
 p028 :: IO ()
 p028 = do
     let res  = diagSum 1001
@@ -135,7 +135,7 @@ diagSum n = foldl' f 1  $ takeWhile (<= n) [3,5..]
                 where f acc i = acc + 4 * i * i - 6 * (i - 1)
 
 ------------------------------------------------------------------
--- > Euler 029:
+-- > Euler 029: Number spiral diagonals
 p029 :: IO ()
 p029 = do
     let res  = solve29 100
@@ -145,77 +145,86 @@ solve29 :: Double -> Int
 solve29 n = length $ S.fromList [b * log a | a <- [2..n], b <- [2..n]]
 
 ------------------------------------------------------------------
--- > Euler 030:
+-- > Euler 030: Digit fifth powers
 p030 :: IO ()
 p030 = do
-    let res  = 0
-    putStrLn $ assertEq res 0 "p030"
+    let res  = solve30 5
+    putStrLn $ assertEq res 443839 "p030"
+
+sumPowers :: Int -> Int -> Int
+sumPowers n m = sum $ map (^m) (digits n)
+
+isDigitPower :: Int -> Int -> Bool
+isDigitPower n m = n == sumPowers n m
+
+solve30 :: Int -> Int
+solve30 n = sum (filter (`isDigitPower` n) [1000 .. (9^n * (n - 1))])
 
 ------------------------------------------------------------------
--- > Euler 031:
+-- > Euler 031: Coin sums
 p031 :: IO ()
 p031 = do
     let res = 0
     putStrLn $ assertEq res 0 "p031"
 
 ------------------------------------------------------------------
--- > Euler 032:
+-- > Euler 032: Pandigital products
 p032 :: IO ()
 p032 = do
     let res  = 0
     putStrLn $ assertEq res 0 "p032"
 
 -----------------------------------------------------------------
--- > Euler 033:
+-- > Euler 033: Problem 33
 p033 :: IO ()
 p033 = do
     let res  = 0
     putStrLn $ assertEq res 0 "p033"
 
 ------------------------------------------------------------------
--- > Euler 034:
+-- > Euler 034: Digit factorials
 p034 :: IO ()
 p034 = do
     let res  = 0
     putStrLn $ assertEq res 0 "p034"
 
 ------------------------------------------------------------------
--- > Euler 035:
+-- > Euler 035: Circular primes
 p035 :: IO ()
 p035 = do
     let res  = 0
     putStrLn $ assertEq res 0 "p035"
 
 ------------------------------------------------------------------
--- > Euler 036:
+-- > Euler 036: Double-base palindromes
 p036 :: IO ()
 p036 = do
     let res  = 0
     putStrLn $ assertEq res 0 "p036"
 
 ------------------------------------------------------------------
--- > Euler 037:
+-- > Euler 037: Truncatable primes
 p037 :: IO ()
 p037 = do
     let res  = 0
     putStrLn $ assertEq res 0 "p037"
 
 ------------------------------------------------------------------
--- > Euler 038:
+-- > Euler 038: Pandigital multiplesPandigital multiples
 p038 :: IO ()
 p038 = do
     let res  = 0
     putStrLn $ assertEq res 0 "p038"
 
 ------------------------------------------------------------------
--- > Euler 039:
+-- > Euler 039: Integer right triangles
 p039 :: IO ()
 p039 = do
     let res  = 0
     putStrLn $ assertEq res 0 "p039"
 
 ------------------------------------------------------------------
--- > Euler 030:
+-- > Euler 040: Champernowne's constant
 p040 :: IO ()
 p040 = do
     let res  = 0
