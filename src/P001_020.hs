@@ -181,9 +181,9 @@ p014 = do
 -- vector based dynamic solution
 maxCollatz :: Int -> Int
 maxCollatz n = runST $ do
-    mVec <- M.replicate (n + 1) 0   -- ^ mutable vector as cache
-    idx  <- newSTRef 1              -- ^ mutable loop counting index
-    best <- newSTRef (0 :: Int)     -- ^ mutable best collatz score
+    mVec <- M.replicate (n + 1) 0   -- mutable vector as cache
+    idx  <- newSTRef 1              -- mutable loop counting index
+    best <- newSTRef (0 :: Int)     -- mutable best collatz score
 
     let collatz x
             | x == 1 = return 1
