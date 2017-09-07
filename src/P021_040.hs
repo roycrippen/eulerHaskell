@@ -167,6 +167,25 @@ p031 = do
     let res = 0
     putStrLn $ assertEq res 0 "p031"
 
+split = split' [200, 100, 50, 20, 10, 5, 2, 1]
+  where split' [1] n = [replicate n 1]
+        split' (c:cs) n
+          | n > c     = map (c:) (split' (c:cs) (n - c)) ++ split' cs n
+          | n == c    = [c] : split' cs n
+          | otherwise = split' cs n
+
+coinSums :: Integer -> [(Integer, Integer, Integer, Integer, Integer, Integer, Integer, Integer)]
+coinSums n = [ (po1, po2, po5, po10, po20, po50, pe1, pe2) |
+    po1  <- [0,1..n],
+    po2  <- [0,2..n-po1],
+    po5  <- [0,5..n-(po1+po2)],
+    po10 <- [0,10..n-(po1+po2+po5)],
+    po20 <- [0,20..n-(po1+po2+po5+po10)],
+    po50 <- [0,50..n-(po1+po2+po5+po10+po20)],
+    pe1  <- [0,100..n-(po1+po2+po5+po10+po20+po50)],
+    pe2  <- [0,200..n-(po1+po2+po5+po10+po20+po50+pe1)],
+    po1 + po2 + po5 + po10 + po20 + po50 + pe1 + pe2 == n]
+    
 ------------------------------------------------------------------
 -- > Euler 032: Pandigital products
 p032 :: IO ()
