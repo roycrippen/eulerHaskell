@@ -1,3 +1,4 @@
+-- | Common functions used to solve Project Euler problems.
 module Common
     ( assertEq
     , parMapChunked

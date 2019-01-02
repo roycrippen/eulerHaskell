@@ -234,18 +234,18 @@ maxCollatz n = runST $ do
                     | k > n -> return mVec
                     | otherwise -> do
                         val <- M.read mVec i
-                        when (val == 0) $ do         -- ^ add new item to cache
+                        when (val == 0) $ do         -- add new item to cache
                             res <- collatz i
                             M.write mVec i res
-                            best' <- readSTRef best  -- ^ save the index of the best result
+                            best' <- readSTRef best  -- save the index of the best result
                             when (res > best') $ do
                                 M.write mVec 0 i
                                 modifySTRef' best (const res)
                         modifySTRef' idx (+ 1)
                         loop
-    loop  -- ^ start the loop
+    loop  -- start the loop
 
-    M.read mVec 0   -- ^ done looping, return answer
+    M.read mVec 0   -- done looping, return answer
 
 -- alternative array solution
 -- similar but slightly slower than vector
@@ -273,16 +273,16 @@ maxCollatz' n = arr' ! 1  where
                         | k > n -> return arr
                         | otherwise -> do
                             val <- readArray arr i
-                            when (val == 0) $ do         -- ^ add new item to cache
+                            when (val == 0) $ do         -- add new item to cache
                                 res <- collatz i
                                 writeArray arr i res
-                                best' <- readSTRef best  -- ^ save the index of the best result
+                                best' <- readSTRef best  -- save the index of the best result
                                 when (res > best') $ do
                                     writeArray arr 1 i
                                     modifySTRef' best (const res)
                             modifySTRef' idx (+ 1)
                             loop
-        loop  -- ^ start the loop
+        loop  -- start the loop
 
 ------------------------------------------------------------------
 -- | Euler 015:
