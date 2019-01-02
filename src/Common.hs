@@ -15,20 +15,26 @@ module Common
     , sumFactors
     , sumFactorsStream
     , cartesianProduct
-    ) where
+    )
+where
 
-import           Control.Arrow               ((&&&))
-import           Control.Monad               (liftM2)
-import           Control.Parallel.Strategies (Strategy, parListChunk, withStrategy)
+import           Control.Arrow                  ( (&&&) )
+import           Control.Monad                  ( liftM2 )
+import           Control.Parallel.Strategies    ( Strategy
+                                                , parListChunk
+                                                , withStrategy
+                                                )
 import           Data.Array.ST
-import           Data.List                   (foldl', group, unfoldr)
-import           Data.Numbers.Primes         (primeFactors)
+import           Data.List                      ( foldl'
+                                                , group
+                                                , unfoldr
+                                                )
+import           Data.Numbers.Primes            ( primeFactors )
 import           Paths_eulerHaskell
 
 -- | Report if solution is correct and create response.
 assertEq :: (Show a, Eq a) => a -> a -> String -> String
-assertEq a b str =
-    if a /= b
+assertEq a b str = if a /= b
     then "ERROR: " ++ str ++ " answer " ++ show a ++ " not equal to " ++ show b
     else str ++ " = " ++ show a
 
@@ -52,7 +58,8 @@ parFilterChunked
     -> (a -> Bool)  -- ^ function to apply to each element
     -> [a]          -- ^ input list
     -> [a]          -- ^ result list
-parFilterChunked strategy i f = withStrategy (parListChunk i strategy) . filter f
+parFilterChunked strategy i f =
+    withStrategy (parListChunk i strategy) . filter f
 
 
 
@@ -67,54 +74,53 @@ getData name = do
 -- > splitOn ',' "one, two, three" == ["one","two","three"]
 splitOn :: Char -> String -> [String]
 splitOn _ [] = [""]
-splitOn delimit (c:cs)
-   | c == delimit = "" : rest
-   | otherwise = (c : head rest) : tail rest
-   where
-       rest = splitOn delimit cs
+splitOn delimit (c : cs) | c == delimit = "" : rest
+                         | otherwise    = (c : head rest) : tail rest
+    where rest = splitOn delimit cs
 
 -- | Int list of the ascii value each character of string.
 --
 -- > toIntChars "abc" == [33,34,35]
 toIntChars :: String -> [Int]
-toIntChars = map (\ c -> fromEnum c - 64)
+toIntChars = map (\c -> fromEnum c - 64)
 
 -- | Return fibonacci number of n.
 --
 -- > fib 25 == 75025
 fib :: Int -> Integer
-fib n
-    | n < 1 = 0
-    | otherwise = fst (fib' n)
+fib n | n < 1     = 0
+      | otherwise = fst (fib' n)
 
 fib' :: Int -> (Integer, Integer)
 fib' 1 = (1, 0)
 fib' n = if even n then (p, q) else (p + q, p)
-    where (a, b) = fib' (n `div` 2)
-          p = (2 * b + a) * a
-          q = a * a + b * b
+  where
+    (a, b) = fib' (n `div` 2)
+    p      = (2 * b + a) * a
+    q      = a * a + b * b
 
 -- | Returns a stream of fibonacci numbers. From https://wiki.haskell.org/The_Fibonacci_sequence
 --
 -- > drop 20 (take 26 fibs) == [6765,10946,17711,28657,46368,75025]
 fibs :: [Integer]
-fibs = unfoldr (\(a,b) -> Just (a,(b,a+b))) (0,1)
+fibs = unfoldr (\(a, b) -> Just (a, (b, a + b))) (0, 1)
 
 -- | Returns if list contain a palindrome (read same from and back).
 --
 -- > isPalindrome [9,0,0,9] == True
 isPalindrome :: Eq a => [a] -> Bool
-isPalindrome []    = False
-isPalindrome [x]   = False
-isPalindrome [x,y] = x == y
-isPalindrome xs    = head xs == last xs && xs == reverse xs
+isPalindrome []     = False
+isPalindrome [x]    = False
+isPalindrome [x, y] = x == y
+isPalindrome xs     = head xs == last xs && xs == reverse xs
 
 -- | Integer number to list of digits.
 -- From http://stackoverflow.com/questions/3963269/split-a-number-into-its-digits-with-haskell
 --
 -- > digits 123 == [1,2,3]
 digits :: Integral a => a -> [a]
-digits = reverse . unfoldr (\x -> if x == 0 then Nothing else Just (mod x 10, div x 10))
+digits = reverse
+    . unfoldr (\x -> if x == 0 then Nothing else Just (mod x 10, div x 10))
 
 -- | Returns a tuple group list of prime factors of n [(prime, count), ...].
 --
@@ -126,13 +132,16 @@ groupPrimeFactors = map (head &&& length) . group . primeFactors
 --
 -- > factors 28 == [1,7,2,14,4,28]
 factors :: Int -> [Int]
-factors = map product . mapM (\(p,m) -> [p^i | i <- [0..m]]) . groupPrimeFactors
+factors =
+    map product
+        . mapM (\(p, m) -> [ p ^ i | i <- [0 .. m] ])
+        . groupPrimeFactors
 
 -- | Factors count of a number.
 --
 -- > numDivisors 28 == 6
 numDivisors :: Int -> Int
-numDivisors n = product $ map ((+1) . length) (group (primeFactors n))
+numDivisors n = product $ map ((+ 1) . length) (group (primeFactors n))
 
 -- | Sum of the factor of n not including n.
 --
@@ -151,4 +160,4 @@ sumFactorsStream = map sumFactors [0 ..]
 --
 -- > cartesianProduct [1..2] [1..2] == [(1,1),(1,2),(2,1),(2,2)]
 cartesianProduct :: [a] -> [b] -> [(a, b)]
-cartesianProduct  = liftM2 (,)
+cartesianProduct = liftM2 (,)

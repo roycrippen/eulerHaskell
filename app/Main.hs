@@ -1,9 +1,11 @@
 module Main where
 
-import           Control.Concurrent.ParallelIO (parallel_, stopGlobalPool)
-import           Lib                           (solutions)
+import           Control.Concurrent.ParallelIO  ( parallel_
+                                                , stopGlobalPool
+                                                )
+import           Lib                            ( solutions )
 import           System.Environment
-import           Text.Read                     (readMaybe)
+import           Text.Read                      ( readMaybe )
 
 
 main :: IO ()
@@ -12,17 +14,16 @@ main = do
     xs <- getArgs
     case xs of
         [] -> do
-                putStrLn "Euler problems in Haskell...\n"
-                parallel_ $ reverse solutions
-                stopGlobalPool
-                putStrLn "done"
+            putStrLn "Euler problems in Haskell...\n"
+            parallel_ $ reverse solutions
+            stopGlobalPool
+            putStrLn "done"
         [x] -> do
-                let n = readMaybe x
-                case n of
-                    (Just x) ->
-                        if x > 0 && x <= length solutions
-                            then solutions !! (x - 1)
-                            else putStrLn $ "Number not in range. " ++ msg
-                    none -> putStrLn $ "Not a number" ++ msg
+            let n = readMaybe x
+            case n of
+                (Just x) -> if x > 0 && x <= length solutions
+                    then solutions !! (x - 1)
+                    else putStrLn $ "Number not in range. " ++ msg
+                none -> putStrLn $ "Not a number" ++ msg
         _ -> putStrLn $ "One arg only. " ++ msg
 
